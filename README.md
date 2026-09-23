@@ -2,33 +2,75 @@
 
 Proyecto de Machine Learning (CS3061), UTEC, 2026-2.
 
-El objetivo es clasificar el siguiente bloque según si su tasa mediana de comisión será alta o no alta. Se utilizará información de bloques anteriores y un umbral calculado solo con entrenamiento.
+El objetivo es clasificar la tasa mediana de comisión del siguiente bloque como alta o no alta, utilizando información de bloques anteriores.
 
-## Archivos
+## Estructura
 
-- `main.tex`: propuesta en LaTeX, con portada e índice.
-- `utec_logo.png`: logo utilizado en la portada.
-- `eda/`: carpeta para el notebook y las figuras del análisis exploratorio. Todavía no se ha realizado el EDA completo.
-
-## Propuesta
-
-Subir `main.tex` y `utec_logo.png` juntos a Overleaf y compilar con pdfLaTeX. Completar los nombres, códigos y docente en los campos entre corchetes.
-
-Para compilar localmente, ejecutar dos veces desde esta carpeta:
-
-```sh
-pdflatex main.tex
+```text
+para_github/
+├── README.md
+├── .gitignore
+├── docs/
+│   ├── main.tex
+│   └── utec_logo.png
+└── eda/
+    ├── dataset.csv
+    ├── 01_eda.ipynb
+    └── requirements.txt
 ```
 
-## Datos y EDA
+## Dataset
 
 Fuente: Jesús Graterol, [Bitcoin Blockchain Historical Data](https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset), Kaggle.
 
-La copia utilizada contiene 810 909 bloques y 13 columnas. El CSV queda fuera de esta carpeta, en `../dataset.csv`; no se sube al repositorio. Quien clone el repositorio puede descargarlo de Kaggle y colocarlo en esa ruta.
+[eda/dataset.csv](eda/dataset.csv) contiene 810 909 bloques y 13 columnas, con registros hasta octubre de 2023. Cada fila representa un bloque. El archivo está incluido y se conserva sin modificaciones.
 
-El futuro notebook se guardará en `eda/01_eda.ipynb`. Si se ejecuta desde `eda/`, el CSV local se encuentra en `../../dataset.csv`.
+Las tasas se analizan en la escala publicada; su unidad y definición históricas exactas requieren verificación adicional con la fuente.
 
-El EDA analizará calidad de datos, distribuciones, evolución temporal, desbalance y relaciones entre variables. El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
+## EDA básico
+
+[eda/01_eda.ipynb](eda/01_eda.ipynb) incluye:
+
+- Carga del CSV, primeras filas, dimensiones y tipos.
+- Valores faltantes, duplicados y revisión básica de valores.
+- Estadísticas descriptivas con `describe()`.
+- Histogramas y boxplots.
+- Revisión de tasas cero y bloques con una transacción.
+- Detección de valores extremos con la regla IQR, sin eliminarlos automáticamente.
+- Definición de la clase y gráfico de su frecuencia.
+- Correlación de Pearson y un diagrama de dispersión.
+
+Se conservan las particiones temporales de la propuesta: 70 % entrenamiento, 15 % validación y 15 % prueba. Los gráficos y el umbral se calculan solo con entrenamiento, después de las revisiones estructurales del archivo completo. No se entrenan modelos.
+
+Las tablas y los seis gráficos están dentro del notebook. No se generan informes de conclusiones, carpetas de resultados ni archivos de registro. La evolución por periodos, las características históricas y el modelado quedan para etapas posteriores.
+
+### Ejecutar
+
+Entorno comprobado: Python 3.13. Desde la raíz del repositorio:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r eda/requirements.txt
+```
+
+Abrir `eda/01_eda.ipynb` en VS Code/Jupyter, seleccionar el entorno `.venv` y ejecutar las celdas en orden. El directorio de trabajo debe ser `eda/`, porque el notebook carga directamente `pd.read_csv("dataset.csv")`.
+
+El notebook ya contiene las salidas de una ejecución completa. No necesita internet para analizar el dataset.
+
+## Propuesta
+
+[docs/main.tex](docs/main.tex) contiene la propuesta. Para Overleaf, subir ese archivo y `docs/utec_logo.png` juntos. Completar los campos de integrantes, códigos y docente.
+
+Para compilar localmente:
+
+```sh
+cd docs
+pdflatex main.tex
+pdflatex main.tex
+```
+
+El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
 
 ## Integrantes
 

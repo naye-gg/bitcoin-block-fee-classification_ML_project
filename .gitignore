@@ -8,4 +8,3 @@ __pycache__/
 *.out
 *.synctex.gz
 main.pdf
-eda/dataset.csv
