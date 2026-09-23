@@ -39,10 +39,11 @@ Las tasas se analizan en la escala publicada; su unidad y definición histórica
 - Detección de valores extremos con la regla IQR, sin eliminarlos automáticamente.
 - Definición de la clase y gráfico de su frecuencia.
 - Correlación de Pearson y un diagrama de dispersión.
+- Evolución anual de la tasa mediana, con una tabla del número de bloques por año.
 
 Se conservan las particiones temporales de la propuesta: 70 % entrenamiento, 15 % validación y 15 % prueba. Los gráficos y el umbral se calculan solo con entrenamiento, después de las revisiones estructurales del archivo completo. No se entrenan modelos.
 
-Las tablas y los seis gráficos están dentro del notebook. No se generan informes de conclusiones, carpetas de resultados ni archivos de registro. La evolución por periodos, las características históricas y el modelado quedan para etapas posteriores.
+Las tablas y los siete gráficos están dentro del notebook. No se generan informes de conclusiones, carpetas de resultados ni archivos de registro. El gráfico anual usa solo entrenamiento y señala que 2019 está incompleto. Las características históricas y el modelado quedan para etapas posteriores.
 
 ### Ejecutar
 
@@ -75,7 +76,7 @@ El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
 ## Integrantes
 
 1. Nombre y código por completar.
-2. Nombre y código por completar.
+2. Guerrero Gutierrez, Nayeli Belén - 202410790
 3. Nombre y código por completar.
 
 Repositorio: https://github.com/naye-gg/bitcoin-block-fee-classification_ML_project
