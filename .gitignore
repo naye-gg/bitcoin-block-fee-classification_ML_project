@@ -1,0 +1,11 @@
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.env
+*.aux
+*.log
+*.toc
+*.out
+*.synctex.gz
+main.pdf
+eda/dataset.csv
