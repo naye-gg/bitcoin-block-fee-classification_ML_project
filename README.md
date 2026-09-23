@@ -7,7 +7,7 @@ El objetivo es clasificar la tasa mediana de comisión del siguiente bloque como
 ## Estructura
 
 ```text
-para_github/
+REPOSITORIO
 ├── README.md
 ├── .gitignore
 ├── docs/
