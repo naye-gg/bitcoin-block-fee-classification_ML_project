@@ -75,8 +75,8 @@ El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
 
 ## Integrantes
 
-1. Nombre y código por completar.
+1. Ordinola Ortega, Carlos David - 
 2. Guerrero Gutierrez, Nayeli Belén - 202410790
-3. Nombre y código por completar.
+3. Alvarado León, Adriana Celeste - 202420154
 
 Repositorio: https://github.com/naye-gg/bitcoin-block-fee-classification_ML_project
