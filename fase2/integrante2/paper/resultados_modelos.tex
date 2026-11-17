@@ -1,0 +1,27 @@
+\subsection{Resultados de los modelos de ensamble}
+La Tabla~\ref{tab:ensambles-validacion} presenta los resultados de las dos familias sobre el mismo periodo de validación, posterior al entrenamiento. Estas cifras no corresponden a la prueba final.
+
+\begin{table}[htbp]
+\caption{Resultados en validación cronológica (62\,808 ejemplos). AP corresponde a average precision.}
+\label{tab:ensambles-validacion}
+\centering
+\small
+\begin{tabular}{lccccc}
+\hline
+Modelo & F1 & Prec. & Recall & AP & ROC-AUC \\
+\hline
+RF & 0.5638 & 0.5966 & 0.5344 & 0.6225 & 0.8171 \\
+HGB & 0.5713 & 0.5608 & 0.5823 & 0.6298 & 0.8217 \\
+\hline
+\end{tabular}
+\end{table}
+
+Los umbrales de probabilidad seleccionados mediante predicciones fuera de fold fueron 0.300 para RF y 0.350 para HGB. El F1 en los datos de ajuste fue 0.6320 y 0.5819, respectivamente. La diferencia entre ajuste y validación debe interpretarse considerando tanto la capacidad del modelo como los cambios temporales de los datos.
+
+En validación, RF produjo 7208 verdaderos positivos, 4873 falsos positivos, 6279 falsos negativos y 44448 verdaderos negativos. En validación, HGB produjo 7853 verdaderos positivos, 6150 falsos positivos, 5634 falsos negativos y 43171 verdaderos negativos.
+
+HGB detectó 645 casos positivos adicionales y produjo 1277 falsos positivos más que RF. Esto refleja el compromiso entre mayor recall y menor precisión observado con los umbrales fijados antes de evaluar este periodo.
+
+La diferencia observada de F1 (HGB menos RF) fue +0.0075. Esta comparación describe un periodo y un conjunto acotado de configuraciones; no demuestra superioridad estadística ni universal. Las curvas precisión--recall y matrices de confusión complementan las métricas agregadas.
+
+La importancia por reducción de impureza de RF se interpreta de manera descriptiva, con cautela ante variables correlacionadas o de alta cardinalidad. No representa una estimación causal. HGB se interpreta mediante sus métricas y errores, sin atribuirle una propiedad de importancia que no expone. Las limitaciones incluyen dependencia temporal, ausencia de información del mempool y exposición previa a distribuciones del conjunto de prueba durante la reformulación de P1. La comparación conjunta con persistencia y regresión logística, así como la evaluación final en prueba, permanecen pendientes de integración. Por tanto, todavía no se concluye que los ensambles superen las referencias simples.
