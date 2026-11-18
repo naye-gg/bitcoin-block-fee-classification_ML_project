@@ -1,0 +1,46 @@
+{
+  "fecha_utc": "2026-11-18T14:25:57.200202+00:00",
+  "politica": "Reproducir ajuste original de train; no reajustar con validación ni seleccionar con test.",
+  "dataset_sha256": "408620117782d1eb68a38eda4c2b2f6cdfc23ccedd6999ca8740d222a835ac6e",
+  "seleccion": {
+    "RandomForest": {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "min_samples_leaf": 30
+      },
+      "candidato": 1,
+      "threshold": 0.3,
+      "f1_cv_05": 0.5890472353688826
+    },
+    "HistGradientBoosting": {
+      "params": {
+        "max_iter": 180,
+        "max_leaf_nodes": 15,
+        "learning_rate": 0.1,
+        "min_samples_leaf": 80,
+        "l2_regularization": 5.0
+      },
+      "candidato": 2,
+      "threshold": 0.35,
+      "f1_cv_05": 0.6301184790574365
+    }
+  },
+  "seed": 42,
+  "fit_rows": 292096,
+  "test_inicio_iloc": 355912,
+  "test_filas": 62808,
+  "test_height_inicial": 748101,
+  "test_height_final": 810908,
+  "python": "3.13.13",
+  "numpy": "2.2.6",
+  "pandas": "2.3.2",
+  "scikit_learn": "1.7.2",
+  "seleccion_sha256": "0324d36c84428897f78c6516a01473342c45b76e0be0fb6b432af0ab6081cb01",
+  "script_sha256": "0472e8e90e706d12b0fb7b54f6ca0328c93d7683b84b363f15bbda504c36f872",
+  "experiment_sha256": "301d84eada16e6bf96d570186677006d0515a926250dedf4d807ce1eb676cc32",
+  "test_evaluado": true,
+  "validacion_reproducida": true,
+  "persistencia_verificada": true,
+  "positivos_test": 15655
+}
