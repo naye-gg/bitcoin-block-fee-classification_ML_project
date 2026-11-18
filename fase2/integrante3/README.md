@@ -14,13 +14,13 @@ Análisis complementario a los modelos de integrante 2: *ablation study*, rendim
 | Conjunto | Variables | AP | F1 |
 |---|---|---|---|
 | A0: tasa actual | 3 | 0.536 | 0.539 |
-| A: comisiones | 17 | 0.622 | 0.570 |
+| A: comisiones | 16 | 0.619 | 0.567 |
 | B: + actividad de la red | 29 | 0.632 | 0.573 |
 | C: + calendario (las 33) | 33 | 0.631 | 0.568 |
 | Persistencia (referencia) | — | — | 0.540 |
 
-- **H1:** la tasa actual sola equivale a la persistencia; la historia de comisiones aporta +0.086 de AP (IC 95 % [0.073, 0.097], bootstrap por bloques semanales).
-- **H2:** la actividad de la red aporta +0.010 de AP (IC [0.006, 0.014]); el calendario, nada.
+- **H1:** la tasa actual sola equivale a la persistencia; la historia de comisiones aporta +0.084 de AP (IC 95 % [0.070, 0.095], bootstrap por bloques semanales).
+- **H2:** la actividad de la red, incluidas las comisiones totales como en la H2 de P1, aporta +0.012 de AP (IC [0.008, 0.017]) y +0.006 de F1 (IC [0.001, 0.011]); el calendario, nada.
 - **H3:** degradación moderada en el tercil de mayor volatilidad (F1 0.548 frente a 0.566–0.575). El error principal son los cambios de clase: el modelo anticipa el 39 % de los finales de episodio y solo el 14 % de los inicios.
 
 ## Archivos
@@ -30,7 +30,7 @@ Análisis complementario a los modelos de integrante 2: *ablation study*, rendim
 - `src/robustez.py`: ablation, bootstrap, análisis por periodos y volatilidad, análisis de errores y figuras.
 - `results/`: tablas CSV, predicciones de validación, `manifest.json` y `figures/`.
 - `paper/`: `robustez.tex` (resultados), `discusion.tex` (incluye consideraciones éticas), `limitaciones.tex` y `conclusiones.tex`.
-- `presentation/`: base de la presentación.
+- El artículo completo está en `../../paper/main.tex` y la presentación en `../../presentation/slides.tex`.
 - `data/`: ver `data/README.md` para colocar el CSV.
 
 ## Ejecutar

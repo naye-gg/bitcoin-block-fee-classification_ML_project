@@ -24,12 +24,13 @@ FIG = OUT / 'figures'
 
 # --- Grupos de variables (las 33 de PROTOCOLO.md, sin crear nuevas) ---------
 TASA_ACTUAL = ['median_fee_rate', 'umbral_local', 'fee_relativa']
+# Como en la H2 de P1, `total_fees` se considera actividad de la red, no comisión.
 COMISIONES = TASA_ACTUAL + [
-    'avg_fee_rate', 'total_fees', 'fee_range_min', 'fee_range_max', 'ratio_avg_mediana',
+    'avg_fee_rate', 'fee_range_min', 'fee_range_max', 'ratio_avg_mediana',
     'fee_lag_1', 'fee_lag_6', 'fee_lag_144',
     'fee_media_6', 'fee_std_6', 'fee_media_144', 'fee_std_144', 'fee_media_1008', 'fee_std_1008']
 ACTIVIDAD = [
-    'size', 'tx_count', 'difficulty', 'input_count', 'output_count', 'output_amount',
+    'total_fees', 'size', 'tx_count', 'difficulty', 'input_count', 'output_count', 'output_amount',
     'size_por_tx', 'input_count_por_tx', 'output_count_por_tx', 'size_relativo_1008',
     'intervalo_segundos', 'intervalo_negativo']
 CALENDARIO = ['hora_sin', 'hora_cos', 'dia_semana_sin', 'dia_semana_cos']
@@ -42,7 +43,7 @@ CONJUNTOS = {
 }
 ETIQUETAS = {
     'A0_tasa_actual': 'A0: tasa actual (3)',
-    'A_comisiones': 'A: comisiones (17)',
+    'A_comisiones': 'A: comisiones (16)',
     'B_comisiones_actividad': 'B: + actividad (29)',
     'C_todas': 'C: + calendario (33)',
     'persistencia': 'Persistencia',
