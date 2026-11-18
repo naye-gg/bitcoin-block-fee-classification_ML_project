@@ -1,0 +1,26 @@
+\subsection{Ablation y robustez}
+Para estimar qué información aporta cada grupo de variables se entrenó un mismo HistGradientBoosting (150 iteraciones, 15 hojas, tasa de aprendizaje 0.1, mínimo de 80 ejemplos por hoja, regularización L2 de 1.0) con cuatro subconjuntos de las 33 características: A0, la tasa actual (\texttt{median\_fee\_rate}, \texttt{umbral\_local} y \texttt{fee\_relativa}); A, todas las variables de comisiones (17); B, comisiones y actividad de la red (29); y C, el conjunto completo con variables de calendario (33). Se emplearon los mismos folds temporales, el mismo \textit{gap} y el mismo criterio de selección del umbral que en los modelos de ensamble. La Tabla~\ref{tab:ablation} resume los resultados en validación.
+
+\begin{table}[htbp]
+\caption{Ablation en validación cronológica (62\,808 ejemplos). La persistencia solo emite etiquetas, por lo que su AP no es comparable.}
+\label{tab:ablation}
+\centering
+\small
+\begin{tabular}{lcccc}
+\hline
+Conjunto & Var. & AP & F1 & ROC-AUC \\
+\hline
+A0: tasa actual & 3 & 0.5357 & 0.5387 & 0.7494 \\
+A: comisiones & 17 & 0.6215 & 0.5698 & 0.8169 \\
+B: + actividad & 29 & 0.6316 & 0.5727 & 0.8199 \\
+C: + calendario & 33 & 0.6309 & 0.5677 & 0.8221 \\
+Persistencia & -- & -- & 0.5400 & -- \\
+\hline
+\end{tabular}
+\end{table}
+
+Las diferencias se evaluaron con un \textit{bootstrap} emparejado por bloques móviles de 1008 bloques sobre validación (1000 remuestreos), para respetar la dependencia entre bloques consecutivos. Incorporar la historia de las comisiones (A frente a A0) aumentó la AP en 0.086 (IC 95\,\%: [0.073, 0.097]). Añadir la actividad de la red (B frente a A) la aumentó en 0.010 ([0.006, 0.014]), con una diferencia en F1 de 0.003 cuyo intervalo incluye el cero. Las variables de calendario no produjeron mejora (C frente a B: $-0.001$ en AP, [$-0.006$, 0.004]). El mismo orden se observó en los tres folds de entrenamiento.
+
+El rendimiento se analizó también por trimestre y según la volatilidad reciente, medida como el coeficiente de variación de las últimas 144 tasas, con terciles fijados en entrenamiento. Entre trimestres, el F1 osciló entre 0.50 y 0.64 de forma paralela en todos los métodos, siguiendo la prevalencia de la clase alta, y la ventaja sobre la persistencia fue positiva en todos ellos. En el tercil de mayor volatilidad, el F1 del modelo C bajó a 0.548, frente a 0.566 y 0.575 en los terciles bajo y medio, y la AP a 0.595, frente a 0.629 y 0.643.
+
+En el análisis de errores, el 19.8\,\% de los bloques de validación correspondió a un cambio de clase, y los episodios de comisión alta duraron en promedio 2.17 bloques. La persistencia falla, por construcción, en todas esas transiciones. El modelo C anticipó el 39\,\% de los finales de episodio, pero solo el 14\,\% de los inicios, a costa de errar en el 3.5\,\% de los tramos bajos estables y en el 10\,\% de los altos estables. La tasa de error fue del 6\,\% cuando la tasa del bloque siguiente quedó por debajo de la mitad del umbral y del 74\,\% cuando lo superó por menos del 5\,\%.
