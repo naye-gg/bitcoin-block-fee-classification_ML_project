@@ -1,6 +1,6 @@
 # Protocolo experimental — integrante 2
 
-Implementación local del plan P2; pendiente de adoptar por el equipo. No constituye un acuerdo ya confirmado por los otros integrantes.
+Protocolo de entrenamiento, selección y evaluación de Random Forest e HistGradientBoosting en la fase 2.
 
 ## Fuente y decisiones heredadas de P1
 
@@ -16,7 +16,7 @@ Implementación local del plan P2; pendiente de adoptar por el equipo. No consti
 
 ## Características concretadas para P2
 
-Esta selección desarrolla las propuestas de P1; el equipo debe usarla también en baselines si quiere aislar el efecto del algoritmo. `src/experiment.py::causal_features` es la definición reproducible y `results/features.csv` su lista de 33 columnas.
+Esta selección desarrolla las propuestas de P1. Los árboles usan 33 variables y la logística 22; la comparación entre ellos no aísla el efecto del algoritmo. `src/experiment.py::causal_features` es la definición reproducible y `results/features.csv` su lista de 33 columnas.
 
 1. Once columnas actuales: size, tx_count, difficulty, median_fee_rate, avg_fee_rate, total_fees, fee_range_min, fee_range_max, input_count, output_count y output_amount.
 2. Umbral móvil actual; razón `(median_fee_rate+1)/(umbral_local+1)`; razón `(avg_fee_rate+1)/(median_fee_rate+1)`. El +1 es una decisión numérica declarada en la escala publicada, no una unidad física verificada. La variable `ratio_avg_mediana` conserva esta convención suavizada.
@@ -43,13 +43,19 @@ No se incluyen height, timestamp crudo, tasa_siguiente, etiqueta ni campos del b
 
 F1 de clase alta es la métrica principal. Se exportan precision, recall, `average_precision` (AP), ROC-AUC, matriz TN/FP/FN/TP y también PR-AUC trapezoidal con su nombre explícito. **AP y área trapezoidal PR son cálculos distintos**; la tabla principal usa AP. Curvas y AUC reciben probabilidades, no etiquetas binarias.
 
-Se utiliza la importancia por reducción de impureza (`feature_importances_`) de RF, como en la sesión 09b, sección 10. Es un diagnóstico descriptivo, susceptible a sesgo por cardinalidad y correlación; no demuestra causalidad. HGB no ofrece esa propiedad, por lo que se interpreta mediante curvas, métricas y errores. Se retiró la extensión propia de permutaciones temporales para mantener la entrega dentro del enfoque del curso.
+Se utiliza la importancia por reducción de impureza (`feature_importances_`) de RF, como en la sesión 09b, sección 10. Es un diagnóstico descriptivo, susceptible a sesgo por cardinalidad y correlación; no demuestra causalidad. HGB no ofrece esa propiedad, por lo que se interpreta mediante curvas, métricas y errores.
 
 
 ## Test e integración
 
-El script no construye `y_test`, no predice test y no calcula su balance. El CSV fuente se lee completo para reproducir P1 y se guardan metadatos de las fronteras ya establecidas. La construcción causal de características no aprende estadísticas globales.
+`src/experiment.py` no construye `y_test`, no predice test y no calcula su balance. El CSV fuente se lee completo para reproducir P1 y se guardan metadatos de las fronteras ya establecidas. La construcción causal de características no aprende estadísticas globales.
 
-Antes de integrar: compartir este protocolo, comprobar hash, target, índices, características y gap con los otros dos integrantes. Añadir las métricas de persistencia y logística cuando estén disponibles; no inventarlas ni afirmar que los ensambles las superan. El P1 ya inspeccionó distribuciones de test para reformular el problema: debe declararse esa exposición histórica, aunque no se use test en esta fase de modelado.
+La comparación integrada con persistencia y logística está en el README general y en `../../paper/main.tex`. Los conjuntos de variables y los márgenes entre particiones difieren entre la logística y los árboles, como se documenta en el paper. P1 inspeccionó distribuciones de test para reformular el problema; esa exposición histórica se mantiene como limitación del estudio.
 
-La evaluación final en test queda pendiente de congelar el protocolo del equipo, los modelos, los umbrales y la política de reajuste. No ejecutar búsquedas ni cambiar configuraciones después de observar ese resultado.
+### Evaluación final congelada (18 de noviembre de 2026)
+
+`src/evaluate_test.py` realiza la evaluación final por separado del experimento de desarrollo. Se conserva `results/seleccion.json`: RF con umbral 0.300 y HGB con umbral 0.350. Se reproducen los ajustes originales sobre las primeras 292 096 filas, con semilla 42 e imputación aprendida solo en ese entrenamiento; **no se reajusta con validación**. Esta política se fijó antes de calcular las métricas de prueba y permite evaluar los mismos modelos de la tabla de validación.
+
+Antes de abrir las etiquetas de test, se verifican las probabilidades de validación de ambas familias contra los archivos originales (tolerancia absoluta 1e-12). Luego se evalúan los 62 808 ejemplos finales, sin búsqueda de hiperparámetros ni optimización del umbral. También se reproduce la persistencia sobre las mismas etiquetas para comprobar F1, precisión y recall contra el integrante 1.
+
+La salida independiente `results/test_final/` conserva métricas, predicciones y un manifiesto con hashes, versiones, selección y política de ajuste. El script rechaza sobrescribir esa carpeta. Los resultados y manifiestos anteriores documentan exclusivamente el experimento de desarrollo y se conservan. No ejecutar búsquedas ni cambiar configuraciones después de observar test.

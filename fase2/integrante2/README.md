@@ -1,19 +1,19 @@
 # P2 — Modelos comparativos de Nayeli (integrante 2)
 
-Random Forest y HistGradientBoosting para clasificar el nivel relativo de comisión del siguiente bloque de Bitcoin. Se reproduce el objetivo móvil de P1, rama `EDA_APARTE`. El test queda reservado.
+Random Forest y HistGradientBoosting para clasificar el nivel relativo de comisión del siguiente bloque de Bitcoin. Se reproduce el objetivo móvil de P1, rama `EDA_APARTE`. La evaluación final de test se documenta por separado en `results/test_final/`.
 
 ## Archivos
 
-- `notebooks/02_models.ipynb`: explicación, ejecución y resultados de tu parte.
+- `notebooks/02_models.ipynb`: procedimiento y resultados de validación de RF y HGB.
 - `src/experiment.py`: preparación causal de datos, búsqueda temporal, entrenamiento, evaluación y figuras.
-- `PROTOCOLO.md`: definición exacta para compartir con los integrantes 1 y 3.
+- `PROTOCOLO.md`: definición del objetivo, las variables y el procedimiento experimental.
 - `results/`: métricas CSV, hiperparámetros, probabilidades de validación y gráficos.
 - `paper/metodologia_modelos.tex` y `paper/resultados_modelos.tex`: fragmentos para insertar en el paper IEEE.
 - `reference/01_eda_recortado_P1.ipynb`: copia de la fuente, sin modificaciones.
 
 ## Datos
 
-En este repositorio el CSV ya está en `../../eda/dataset.csv` desde la raíz de esta entrega. Copiarlo a `data/dataset.csv` antes de ejecutar: `cp ../../eda/dataset.csv data/dataset.csv`. Para otra máquina, obtener el archivo usado en P1 de [la fuente](https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset) o del repositorio del equipo y colocarlo en esa ruta. Una versión actualizada de Kaggle puede ser distinta: el script exige el SHA-256 documentado en `PROTOCOLO.md`. No subir automáticamente el CSV de 70 MB; se incluye en `.gitignore`.
+En este repositorio el CSV ya está en `../../eda/dataset.csv` desde la raíz de esta entrega. Copiarlo a `data/dataset.csv` antes de ejecutar: `cp ../../eda/dataset.csv data/dataset.csv`. Para otra máquina, obtener el archivo usado en P1 de [la fuente](https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset) o del repositorio del equipo y colocarlo en esa ruta. Una versión actualizada de Kaggle puede ser distinta: el script exige el SHA-256 documentado en `PROTOCOLO.md`. La copia local del CSV está excluida del control de versiones mediante `.gitignore`.
 
 ## Ejecutar
 
@@ -34,4 +34,13 @@ El experimento genera un manifiesto con versiones y configuración. Se verifican
 
 ## Alcance de la entrega
 
-Esta entrega contiene tus dos familias de modelos, búsqueda, métricas, curvas PR, matrices e interpretación. Las características derivadas son una concreción de las propuestas de P1: compartirlas con el equipo antes de consolidar comparaciones. No contiene resultados de los modelos del integrante 1 ni el ablation del integrante 3. Las cifras son de validación, no del test final. La validación podrá participar en la integración; por ello no reemplaza la evaluación final reservada.
+Esta carpeta contiene la búsqueda temporal, las métricas, las curvas PR, las matrices de confusión y la interpretación de RF y HGB. El notebook conserva el experimento de validación; la evaluación final de prueba está en `results/test_final/`. La comparación con los baselines y el análisis de ablación se presentan en el README general y en `../../paper/main.tex`. La logística utiliza 22 variables y los árboles 33, por lo que sus diferencias de rendimiento no pueden atribuirse únicamente al algoritmo.
+
+
+## Evaluación final de prueba
+
+`src/evaluate_test.py` reproduce los modelos seleccionados sobre el entrenamiento original, comprueba sus predicciones de validación y evalúa test con umbrales congelados (RF 0.300, HGB 0.350). No reajusta con validación. Lee directamente `../../eda/dataset.csv`.
+
+Las métricas están en `results/test_final/metricas.csv`; el manifiesto y las predicciones de cada modelo permiten auditar el resultado. El notebook y `results/model_comparison.csv` conservan la evaluación original de desarrollo.
+
+Para reproducir en una copia de trabajo sin `results/test_final/`, ejecutar `python src/evaluate_test.py`. El script rechaza sobrescribir una evaluación existente. No usar test para cambiar la selección ni ajustar umbrales.

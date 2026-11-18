@@ -23,7 +23,7 @@ Machine Learning (CS3061) --- 2026-2}
 \maketitle
 
 \begin{abstract}
-En Bitcoin, el espacio de cada bloque es limitado y las transacciones compiten mediante comisiones. Este trabajo plantea una clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del bloque siguiente superará el percentil 75 de las 1008 tasas más recientes, usando solo información disponible hasta el bloque actual. Se emplean 418\,720 bloques de 2016 a 2023 del conjunto \textit{Bitcoin Blockchain Historical Data}, con una partición cronológica 70/15/15. Se comparan una referencia de persistencia, una regresión logística regularizada, Random Forest e HistGradientBoosting, con selección temporal de hiperparámetros y del umbral de decisión. La persistencia resulta una referencia exigente: en prueba obtiene un F1 de 0.576, frente a 0.570 de la regresión logística. En validación, los modelos de árboles alcanzan un F1 de 0.564--0.571 y una precisión promedio de 0.62--0.63, frente a 0.540 y 0.593 de las referencias. Un estudio de ablación muestra que la ganancia procede de la historia reciente de las comisiones (+0.084 de precisión promedio), mientras que la actividad de la red aporta poco (+0.012) y el calendario nada. El análisis de errores indica que los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran en promedio unos dos bloques, lo que apunta a la ausencia de información del \textit{mempool} como límite principal.
+En Bitcoin, el espacio de cada bloque es limitado y las transacciones compiten mediante comisiones. Este trabajo plantea una clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del bloque siguiente superará el percentil 75 de las 1008 tasas más recientes, usando solo información disponible hasta el bloque actual. Se emplean 418\,720 bloques de 2016 a 2023 del conjunto \textit{Bitcoin Blockchain Historical Data}, con una partición cronológica 70/15/15. Se comparan una referencia de persistencia, una regresión logística regularizada, Random Forest e HistGradientBoosting, con selección temporal de hiperparámetros y del umbral de decisión. En prueba, RF y HGB alcanzan F1 de 0.605 y 0.609, frente a 0.576 de la persistencia y 0.570 de la regresión logística; sus precisiones promedio son 0.684 y 0.690. En validación, los modelos de árboles alcanzan un F1 de 0.564--0.571 y una precisión promedio de 0.62--0.63, frente a 0.540 y 0.593 de las referencias. Un estudio de ablación muestra que la ganancia procede de la historia reciente de las comisiones (+0.084 de precisión promedio), mientras que la actividad de la red aporta poco (+0.012) y el calendario nada. El análisis de errores indica que los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran en promedio unos dos bloques, lo que apunta a la ausencia de información del \textit{mempool} como límite principal.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -257,7 +257,11 @@ Fold & Ajuste & Validación interna & Positivos \\
 % =====================================================================
 \section{Resultados}
 \subsection{Comparación de métodos}
+Para la evaluación final de RF y HGB se conservaron los ajustes originales sobre 292\,096 filas de entrenamiento, sin reajustar con validación, y los umbrales OOF de 0.300 y 0.350. Se reprodujeron las probabilidades de validación de ambas familias antes de evaluar los 62\,808 ejemplos de prueba. No se realizaron búsquedas ni ajustes del umbral en prueba.
+
 La Tabla~\ref{tab:resultados} reúne los cuatro métodos. En validación, RF y HGB superan a la persistencia en F1 (+0.024 y +0.032) y a la regresión logística en AP (+0.030 y +0.037). En prueba, la persistencia supera a la regresión logística en F1 (0.5763 frente a 0.5704), aunque esta discrimina claramente mejor que el azar: su AP es 0.617, 2.5 veces la tasa base de 0.249 (Fig.~\ref{fig:logistica}).
+
+En prueba, RF y HGB superan a la persistencia en F1 por 0.0285 y 0.0330, respectivamente. Sus AP son 0.6838 y 0.6898, frente a 0.6166 de la logística. Estas diferencias son descriptivas y no demuestran significancia estadística; además, la logística y los árboles emplean conjuntos de variables diferentes.
 
 \begin{table}[htbp]
 \caption{Resultados de los cuatro métodos. La persistencia solo emite etiquetas, por lo que no tiene AP ni ROC-AUC.}
@@ -276,8 +280,8 @@ HGB & Val. & 0.5713 & 0.5608 & 0.5823 & 0.6298 & 0.8217 \\
 \midrule
 Persistencia & Prueba & 0.5763 & 0.5770 & 0.5755 & -- & -- \\
 Logística & Prueba & 0.5704 & 0.5478 & 0.5950 & 0.6166 & 0.8061 \\
-RF & Prueba & \multicolumn{5}{c}{pendiente de la evaluación final} \\
-HGB & Prueba & \multicolumn{5}{c}{pendiente de la evaluación final} \\
+RF & Prueba & 0.6048 & 0.5947 & 0.6152 & 0.6838 & 0.8283 \\
+HGB & Prueba & 0.6093 & 0.5704 & 0.6538 & 0.6898 & 0.8328 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -438,7 +442,7 @@ Este trabajo evaluó si las estadísticas históricas a nivel de bloque permiten
 \item \textbf{H3 se confirma parcialmente:} el rendimiento disminuye en el tercil de mayor volatilidad de forma moderada. La principal fuente de error son los cambios de clase, sobre todo el inicio de los episodios de comisión alta.
 \end{itemize}
 
-La persistencia es una referencia difícil de superar: la regresión logística no lo logra en prueba, y los modelos de árboles la superan en validación por un margen modesto en F1 y mayor en AP. El aprendizaje principal es que el límite no está en el algoritmo, sino en la información disponible: sin el estado del \textit{mempool}, la llegada de nueva demanda no puede anticiparse.
+La persistencia es una referencia difícil de superar: la regresión logística no lo logra en prueba, mientras que RF y HGB sí la superan, con F1 de 0.6048 y 0.6093 frente a 0.5763. La ventaja descriptiva de los árboles se observa tanto en validación como en prueba; no se ha establecido su significancia estadística. El aprendizaje principal es que el límite no está en el algoritmo, sino en la información disponible: sin el estado del \textit{mempool}, la llegada de nueva demanda no puede anticiparse.
 
 Como trabajo futuro se propone incorporar datos del \textit{mempool} o de tasas ofrecidas en tiempo real; plantear la detección del inicio de los episodios de congestión como una tarea propia; evaluar horizontes de predicción mayores que un bloque; unificar el conjunto de variables entre modelos; y definir la clase con un margen alrededor del umbral que reduzca la ambigüedad de las etiquetas.
 

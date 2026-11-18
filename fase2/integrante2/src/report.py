@@ -1,4 +1,4 @@
-"""Renderiza los resultados del paper a partir de los CSV, sin inventar cifras."""
+"""Genera el fragmento de validación del paper a partir de los resultados CSV."""
 from pathlib import Path
 import json
 import pandas as pd
@@ -40,17 +40,17 @@ Modelo & F1 & Prec. & Recall & AP & ROC-AUC \\
     latex+=f'HGB detectó {int(gb.tp-rf.tp)} casos positivos adicionales y produjo {int(gb.fp-rf.fp)} falsos positivos más que RF. Esto refleja el compromiso entre mayor recall y menor precisión observado con los umbrales fijados antes de evaluar este periodo.\n\n'
     diff=gb.f1-rf.f1
     latex+=f'La diferencia observada de F1 (HGB menos RF) fue {diff:+.4f}. Esta comparación describe un periodo y un conjunto acotado de configuraciones; no demuestra superioridad estadística ni universal. Las curvas precisión--recall y matrices de confusión complementan las métricas agregadas.\n\n'
-    latex+=r'''La importancia por reducción de impureza de RF se interpreta de manera descriptiva, con cautela ante variables correlacionadas o de alta cardinalidad. No representa una estimación causal. HGB se interpreta mediante sus métricas y errores, sin atribuirle una propiedad de importancia que no expone. Las limitaciones incluyen dependencia temporal, ausencia de información del mempool y exposición previa a distribuciones del conjunto de prueba durante la reformulación de P1. La comparación conjunta con persistencia y regresión logística, así como la evaluación final en prueba, permanecen pendientes de integración. Por tanto, todavía no se concluye que los ensambles superen las referencias simples.
+    latex+=r'''La importancia por reducción de impureza de RF se interpreta de manera descriptiva, con cautela ante variables correlacionadas o de alta cardinalidad. No representa una estimación causal. HGB se interpreta mediante sus métricas y errores, sin atribuirle una propiedad de importancia que no expone. Las limitaciones incluyen dependencia temporal, ausencia de información del mempool y exposición previa a distribuciones del conjunto de prueba durante la reformulación de P1. Este fragmento describe el experimento de validación. La evaluación de prueba se documenta por separado en results/test\_final/ y la comparación integrada se presenta en el paper principal.
 '''
     (root/'paper/resultados_modelos.tex').write_text('\n'.join(line.rstrip() for line in latex.splitlines())+'\n')
     summary=['RESULTADOS DE VALIDACIÓN — INTEGRANTE 2','',
-      'No se evaluó test. Faltan integrar los baselines del integrante 1.', '']
+      'Este resumen corresponde a validación. La evaluación final de prueba se documenta por separado en results/test_final/.', '']
     for name in val.index:
         r=val.loc[name]
         summary.append(f'{name}: F1={r.f1:.4f}; precision={r.precision:.4f}; recall={r.recall:.4f}; AP={r.average_precision:.4f}; ROC-AUC={r.roc_auc:.4f}; umbral={r.umbral:.3f}.')
         summary.append('Configuración: '+json.dumps(selected[name]['params']))
     summary+=['',f'Diferencia F1 HGB−RF: {diff:+.4f}. No equivale a significancia estadística.',
-      'El código y PROTOCOLO.md fijan 33 predictores. Acordarlos con el equipo antes de comparar algoritmos.',
+      'Los árboles utilizan 33 predictores y la logística 22; la comparación no aísla el efecto del algoritmo.',
       'La partición de validación empieza en height 685293; test empieza en height 748101.',
       'Los modelos se ajustan hasta la fila 292095 de desarrollo (292096 ejemplos), con un gap de 1008.']
     (out/'RESUMEN.txt').write_text('\n'.join(summary)+'\n')

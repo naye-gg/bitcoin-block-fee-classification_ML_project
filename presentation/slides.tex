@@ -193,14 +193,15 @@ Método & F1 val. & AP val. & F1 prueba \\
 \midrule
 Persistencia & 0.540 & -- & 0.576 \\
 Logística & 0.557 & 0.593 & 0.570 \\
-Random Forest & 0.564 & 0.623 & pend. \\
-HGB & 0.571 & 0.630 & pend. \\
+Random Forest & 0.564 & 0.623 & 0.605 \\
+HGB & 0.571 & 0.630 & 0.609 \\
 \bottomrule
 \end{tabular}
 \vspace{0.3cm}
 \begin{itemize}
 \item En validación, los árboles superan a la persistencia (+0.03 de F1) y a la logística (+0.04 de AP).
-\item HGB detecta 645 positivos más que RF, con 1\,277 falsos positivos adicionales.
+\item En prueba: RF/HGB ganan +0.029/+0.033 de F1 frente a persistencia; AP 0.684/0.690.
+\item Mismos ajustes y umbrales; sin reajuste con validación ni selección con prueba.
 \end{itemize}
 \column{0.48\textwidth}
 \includegraphics[width=\textwidth]{curvas_pr.png}
@@ -288,7 +289,7 @@ $\Rightarrow$ \textbf{H1 y H2 se confirman.}
 \item \textbf{H1 se confirma:} la tasa reciente domina, pero el valor aparece con su historia (+0.084 AP).
 \item \textbf{H2 se confirma:} la actividad de la red aporta poco (+0.012 AP); el calendario, nada.
 \item \textbf{H3 parcial:} empeora algo con alta volatilidad; el error principal son los inicios de los episodios.
-\item La persistencia es una referencia difícil: la logística no la supera en prueba.
+\item En prueba, RF y HGB superan a persistencia (F1 0.605/0.609 frente a 0.576); la logística no. Diferencias descriptivas, sin prueba de significancia.
 \item El límite principal no es el algoritmo, sino la \textbf{información disponible}.
 \item \textbf{Trabajo futuro:} datos del \textit{mempool}, detectar el inicio de la congestión como tarea propia, horizontes mayores y clases con margen alrededor del umbral.
 \end{itemize}
