@@ -1,1 +1,13 @@
-% Sección de conclusiones — integrante 3. Completar con cifras de validación.
+\section{Conclusiones}
+% Versión provisional basada en validación. Actualizar con la evaluación final en prueba.
+Este trabajo evaluó si las estadísticas históricas a nivel de bloque permiten anticipar si el siguiente bloque de Bitcoin tendrá comisiones elevadas respecto a la semana anterior. Respecto a las hipótesis planteadas en P1:
+
+\begin{itemize}
+\item \textbf{H1} se confirma: la tasa reciente es el predictor dominante. No obstante, el estado actual por sí solo equivale a la regla de persistencia; el valor predictivo aparece al incorporar la historia reciente de las comisiones.
+\item \textbf{H2} se confirma: las variables de actividad de la red aportan una mejora pequeña pero detectable (+0.010 en AP), muy inferior a la de las variables de comisiones (+0.086). Las variables de calendario no aportan información.
+\item \textbf{H3} se confirma parcialmente: el rendimiento disminuye en los periodos de mayor volatilidad, aunque de forma moderada. La principal fuente de error son los cambios de clase, en particular el inicio de los episodios de comisión alta.
+\end{itemize}
+
+Los modelos superan a la persistencia de forma consistente en todos los trimestres de validación, con una mejora modesta en F1 y mayor en AP. El límite principal no es el algoritmo, sino la información disponible: sin el estado del \textit{mempool}, la llegada de nueva demanda no puede anticiparse.
+
+Como trabajo futuro se propone incorporar datos del \textit{mempool} o de tasas ofrecidas en tiempo real, formular el problema como la detección del inicio de episodios de congestión, evaluar horizontes de predicción mayores que un bloque y estudiar definiciones del objetivo con un margen alrededor del umbral que reduzcan la ambigüedad de las etiquetas.

@@ -1,1 +1,11 @@
-% Sección de limitaciones — integrante 3. Completar con cifras de validación.
+\subsection{Limitaciones}
+\begin{itemize}
+\item \textbf{Ausencia del \textit{mempool}.} El dataset solo registra bloques minados. La demanda pendiente, que anticipa los episodios de congestión, no es observable, lo que limita sobre todo la detección del inicio de los episodios de comisión alta.
+\item \textbf{Frontera de la clase.} La etiqueta compara la tasa del bloque siguiente con un percentil móvil. Muchas observaciones quedan muy cerca de ese umbral, y las inconsistencias de la fuente (el 0.31\,\% de los bloques presenta la mediana fuera del rango publicado) pueden alterar la clase asignada.
+\item \textbf{Datos agregados y sesgo de selección.} Cada observación resume un bloque completo y solo incluye transacciones confirmadas. No es posible inferir el comportamiento de transacciones individuales ni de las ofertas que nunca se incluyeron.
+\item \textbf{Dependencia temporal.} Los bloques consecutivos no son independientes. El \textit{bootstrap} por bloques semanales lo considera de forma aproximada, y los intervalos no se corrigen por comparaciones múltiples.
+\item \textbf{Representatividad de la validación.} El periodo de validación contiene pocos episodios de alta volatilidad, por lo que la evidencia sobre la robustez en condiciones turbulentas es limitada.
+\item \textbf{Alcance del \textit{ablation}.} Las conclusiones sobre grupos de variables se obtuvieron con un único algoritmo y una configuración fija, aunque el Random Forest apunta en la misma dirección.
+\item \textbf{Exposición previa del conjunto de prueba.} Durante la reformulación del objetivo en P1 se inspeccionó la proporción de clases en prueba. En esta etapa no se usó ese conjunto para ajustar ningún modelo, pero esa exposición se declara de forma explícita.
+\item \textbf{Periodo de estudio.} Los resultados corresponden a bloques de 2016 a 2023 y no se extrapolan a contextos donde el espacio en bloque no sea escaso.
+\end{itemize}

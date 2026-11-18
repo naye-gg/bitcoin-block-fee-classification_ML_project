@@ -5,7 +5,11 @@ No redefine target, particiones ni características: importa
 para leer `fase2/integrante3/data/dataset.csv`. El test no se materializa.
 """
 from pathlib import Path
+import os
 import sys
+import tempfile
+
+os.environ.setdefault('MPLCONFIGDIR', str(Path(tempfile.gettempdir()) / 'ml-p2-matplotlib'))
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC_INTEGRANTE2 = ROOT.parent / 'integrante2' / 'src'
