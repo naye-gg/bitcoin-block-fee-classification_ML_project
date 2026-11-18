@@ -1,111 +1,95 @@
-# Clasificación de comisiones por bloque de Bitcoin
+# Predicción del nivel relativo de comisiones del siguiente bloque de Bitcoin
 
-Proyecto de Machine Learning (CS3061), UTEC, 2026-2.
+Proyecto final de Machine Learning (CS3061), UTEC, 2026-2.
 
-El objetivo es clasificar la tasa mediana de comisión del siguiente bloque como alta o no alta, utilizando información de bloques anteriores.
+Clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del **bloque siguiente** superará el percentil 75 de las 1008 tasas más recientes (aproximadamente una semana), usando solo información disponible hasta el bloque actual.
+
+## Integrantes
+
+| Integrante | Código | Parte en la fase 2 |
+|---|---|---|
+| Ordinola Ortega, Carlos David | | 1 — EDA orientado a la predicción, persistencia y regresión logística |
+| Guerrero Gutierrez, Nayeli Belén | 202410790 | 2 — Random Forest, HistGradientBoosting y validación temporal |
+| Alvarado León, Adriana Celeste | 202420154 | 3 — Ablation, robustez, análisis de errores, paper y presentación |
+
+## Resultados principales
+
+| Método | F1 validación | AP validación | F1 prueba | AP prueba |
+|---|---|---|---|---|
+| Persistencia | 0.540 | — | 0.576 | — |
+| Regresión logística | 0.557 | 0.593 | 0.570 | 0.617 |
+| Random Forest | 0.564 | 0.623 | pendiente | pendiente |
+| HistGradientBoosting | 0.571 | 0.630 | pendiente | pendiente |
+
+- La persistencia es una referencia exigente: la regresión logística no la supera en prueba.
+- El ablation muestra que la ganancia viene de la historia reciente de las comisiones (+0.084 de AP); la actividad de la red aporta poco (+0.012) y el calendario nada.
+- Los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran unos dos bloques. Falta el estado del *mempool*, que el dataset no contiene.
 
 ## Estructura
 
 ```text
-REPOSITORIO
 ├── README.md
-├── .gitignore
-├── docs/
-│   ├── main.tex
-│   └── utec_logo.png
+├── docs/                       propuesta inicial (P1)
 ├── eda/
-│   ├── dataset.csv
-│   ├── 01_eda.ipynb
+│   ├── 01_eda.ipynb            EDA de P1 (versión recortada desde 2016)
+│   ├── dataset.csv             dataset de P1
 │   └── requirements.txt
-└── fase2/
-    └── integrante1/
-        ├── README.md
-        ├── BITACORA.md
-        ├── VERIFICACION.md
-        ├── requirements.txt
-        ├── notebooks/
-        │   └── 01_baselines.ipynb
-        ├── paper/
-        │   └── secciones_integrante1.md
-        └── results/
-            ├── baselines_resultados.csv
-            ├── busqueda_logistica.csv
-            └── figures/
+├── fase2/
+│   ├── integrante1/            baselines: notebooks/01_baselines.ipynb, resultados y texto
+│   ├── integrante2/            ensambles: PROTOCOLO.md, src/experiment.py, notebooks/02_models.ipynb
+│   └── integrante3/            robustez: src/robustez.py, notebooks/04_robustez.ipynb
+├── paper/
+│   ├── main.tex                artículo final (plantilla IEEE de conferencias)
+│   └── figures/
+└── presentation/
+    └── slides.tex              presentación de 10 minutos (Beamer)
 ```
+
+Cada carpeta de `fase2/` tiene su propio README con instrucciones y detalle de resultados.
 
 ## Dataset
 
-Fuente: Jesús Graterol, [Bitcoin Blockchain Historical Data](https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset), Kaggle.
+Fuente: Jesús Graterol, [Bitcoin Blockchain Historical Data](https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset), Kaggle. 810 909 bloques y 13 columnas, de enero de 2009 a octubre de 2023.
 
-[eda/dataset.csv](eda/dataset.csv) contiene 810 909 bloques y 13 columnas, con registros hasta octubre de 2023. Cada fila representa un bloque. El archivo está incluido y se conserva sin modificaciones.
+El archivo usado está en [eda/dataset.csv](eda/dataset.csv). Su SHA-256 es `408620117782d1eb68a38eda4c2b2f6cdfc23ccedd6999ca8740d222a835ac6e`. En Windows con `core.autocrlf=true`, la copia de trabajo puede tener saltos de línea CRLF y otro hash; para obtener el archivo exacto:
 
-Las tasas se analizan en la escala publicada; su unidad y definición históricas exactas requieren verificación adicional con la fuente.
-
-## EDA básico
-
-[eda/01_eda.ipynb](eda/01_eda.ipynb) incluye:
-
-- Carga del CSV, primeras filas, dimensiones y tipos.
-- Valores faltantes, duplicados y revisión básica de valores.
-- Estadísticas descriptivas con `describe()`.
-- Histogramas y boxplots.
-- Revisión de tasas cero y bloques con una transacción.
-- Detección de valores extremos con la regla IQR, sin eliminarlos automáticamente.
-- Definición de la clase y gráfico de su frecuencia.
-- Correlación de Pearson y un diagrama de dispersión.
-- Evolución anual de la tasa mediana, con una tabla del número de bloques por año.
-
-Se conservan las particiones temporales de la propuesta: 70 % entrenamiento, 15 % validación y 15 % prueba. Los gráficos y el umbral se calculan solo con entrenamiento, después de las revisiones estructurales del archivo completo. No se entrenan modelos.
-
-Las tablas y los siete gráficos están dentro del notebook. No se generan informes de conclusiones, carpetas de resultados ni archivos de registro. El gráfico anual usa solo entrenamiento y señala que 2019 está incompleto. Las características históricas y el modelado quedan para etapas posteriores.
-
-### Ejecutar
-
-Entorno comprobado: Python 3.13. Desde la raíz del repositorio:
-
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r eda/requirements.txt
+```bash
+git show HEAD:eda/dataset.csv > fase2/integrante2/data/dataset.csv
+git show HEAD:eda/dataset.csv > fase2/integrante3/data/dataset.csv
 ```
 
-Abrir `eda/01_eda.ipynb` en VS Code/Jupyter, seleccionar el entorno `.venv` y ejecutar las celdas en orden. El directorio de trabajo debe ser `eda/`, porque el notebook carga directamente `pd.read_csv("dataset.csv")`.
+## Protocolo común
 
-El notebook ya contiene las salidas de una ejecución completa. No necesita internet para analizar el dataset.
+- Bloques ordenados por `height`, desde el 1 de enero de 2016; 418 720 ejemplos tras descartar las 1007 filas sin ventana completa.
+- Partición cronológica 70/15/15: 293 104 / 62 808 / 62 808 ejemplos, con 24.65 % / 21.47 % / 24.93 % de positivos.
+- Variables construidas solo con información hasta el bloque actual; transformaciones ajustadas en entrenamiento.
+- Métrica principal: F1 de la clase alta. Secundarias: precisión, exhaustividad, AP y ROC-AUC.
+- Detalle completo en [fase2/integrante2/PROTOCOLO.md](fase2/integrante2/PROTOCOLO.md).
 
-## Fase 2
+## Reproducir
 
-[fase2/integrante1/](fase2/integrante1/) contiene la parte de EDA orientado a la predicción, baselines
-(persistencia y regresión logística) y redacción de las secciones de problema, datos, EDA y
-metodología de baselines. Su [README](fase2/integrante1/README.md) resume los resultados y las
-instrucciones de ejecución. El notebook lee directamente [eda/dataset.csv](eda/dataset.csv), sin
-copias del dataset.
+Python 3.12 o 3.13 (en 3.14 no hay wheel de `numpy==2.2.6`).
 
-## Propuesta
-
-[docs/main.tex](docs/main.tex) contiene la propuesta. Para Overleaf, subir ese archivo y `docs/utec_logo.png` juntos. Completar los campos de integrantes, códigos y docente.
-
-Para compilar localmente:
-
-```sh
-cd docs
-pdflatex main.tex
-pdflatex main.tex
+```bash
+python -m venv .venv
+source .venv/bin/activate          # Windows (Git Bash): source .venv/Scripts/activate
 ```
 
-El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
+| Parte | Dependencias | Ejecución |
+|---|---|---|
+| EDA (P1) | `eda/requirements.txt` | `eda/01_eda.ipynb`, con `eda/` como directorio de trabajo |
+| Integrante 1 | `fase2/integrante1/requirements.txt` | `fase2/integrante1/notebooks/01_baselines.ipynb` |
+| Integrante 2 | `fase2/integrante2/requirements.txt` | `python src/experiment.py` desde `fase2/integrante2/` |
+| Integrante 3 | `fase2/integrante3/requirements.txt` | `python src/robustez.py` desde `fase2/integrante3/` |
 
-## Integrantes
+Los notebooks incluyen las salidas de una ejecución completa.
 
-1. Ordinola Ortega, Carlos David - 
-2. Guerrero Gutierrez, Nayeli Belén - 202410790
-3. Alvarado León, Adriana Celeste - 202420154
+## Paper y presentación
+
+`paper/main.tex` y `presentation/slides.tex` compilan en Overleaf: subir cada carpeta completa (con `figures/` o `utec_logo.png`) y compilar con pdfLaTeX. Localmente:
+
+```bash
+cd paper && pdflatex main.tex && pdflatex main.tex
+```
 
 Repositorio: https://github.com/naye-gg/bitcoin-block-fee-classification_ML_project
-
-
-## Fase 2 — Integrante 2
-
-[Notebook de Random Forest e HistGradientBoosting](fase2/integrante2/notebooks/02_models.ipynb), con resultados de validación, figuras y secciones del paper.
-
-Ver [instrucciones](fase2/integrante2/README.md) y [protocolo común propuesto](fase2/integrante2/PROTOCOLO.md). El test permanece reservado; falta integrar los baselines y acordar las características con el equipo.

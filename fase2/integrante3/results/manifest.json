@@ -20,7 +20,6 @@
       "umbral_local",
       "fee_relativa",
       "avg_fee_rate",
-      "total_fees",
       "fee_range_min",
       "fee_range_max",
       "ratio_avg_mediana",
@@ -39,7 +38,6 @@
       "umbral_local",
       "fee_relativa",
       "avg_fee_rate",
-      "total_fees",
       "fee_range_min",
       "fee_range_max",
       "ratio_avg_mediana",
@@ -52,6 +50,7 @@
       "fee_std_144",
       "fee_media_1008",
       "fee_std_1008",
+      "total_fees",
       "size",
       "tx_count",
       "difficulty",
@@ -70,7 +69,6 @@
       "umbral_local",
       "fee_relativa",
       "avg_fee_rate",
-      "total_fees",
       "fee_range_min",
       "fee_range_max",
       "ratio_avg_mediana",
@@ -83,6 +81,7 @@
       "fee_std_144",
       "fee_media_1008",
       "fee_std_1008",
+      "total_fees",
       "size",
       "tx_count",
       "difficulty",
@@ -113,5 +112,5 @@
   "numpy": "2.2.6",
   "pandas": "2.3.2",
   "scikit_learn": "1.7.2",
-  "code_sha256": "6538bbfaaecb44ba659dd8895111bc91485036f17720a11105926473bb5c6e06"
+  "code_sha256": "b36d1a2455d6325149a34bb6014f46916d67572f2cd982413188210475a9be79"
 }

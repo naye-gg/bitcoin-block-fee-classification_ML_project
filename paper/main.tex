@@ -1,0 +1,220 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-tabla,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{figures/}}
+
+\begin{document}
+
+\title{Predicción del nivel relativo de comisiones del siguiente bloque de Bitcoin mediante aprendizaje supervisado}
+
+\author{
+\IEEEauthorblockN{Carlos David Ordinola Ortega, Nayeli Belén Guerrero Gutierrez, Adriana Celeste Alvarado León}
+\IEEEauthorblockA{Universidad de Ingeniería y Tecnología (UTEC), Lima, Perú\\
+Machine Learning (CS3061) --- 2026-2}
+}
+
+\maketitle
+
+\begin{abstract}
+En Bitcoin, el espacio de cada bloque es limitado y las transacciones compiten mediante comisiones. Este trabajo plantea una clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del bloque siguiente superará el percentil 75 de las 1008 tasas más recientes, usando solo información disponible hasta el bloque actual. Se emplean 418\,720 bloques de 2016 a 2023 del conjunto \textit{Bitcoin Blockchain Historical Data}, con una partición cronológica 70/15/15. Se comparan una referencia de persistencia, una regresión logística regularizada, Random Forest e HistGradientBoosting, con selección temporal de hiperparámetros y del umbral de decisión. La persistencia resulta una referencia exigente: en prueba obtiene un F1 de 0.576, frente a 0.570 de la regresión logística. En validación, los modelos de árboles alcanzan un F1 de 0.564--0.571 y una precisión promedio de 0.62--0.63, frente a 0.540 y 0.593 de las referencias. Un estudio de ablación muestra que la ganancia procede de la historia reciente de las comisiones (+0.084 de precisión promedio), mientras que la actividad de la red aporta poco (+0.012) y el calendario nada. El análisis de errores indica que los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran en promedio unos dos bloques, lo que apunta a la ausencia de información del \textit{mempool} como límite principal.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Bitcoin, comisiones, clasificación binaria, series temporales, ensambles de árboles, estudio de ablación
+\end{IEEEkeywords}
+
+\section{Introducción y formulación del problema}
+Cuando una persona emite una transacción en Bitcoin debe elegir qué comisión ofrece a los mineros. Una comisión insuficiente puede dejar la transacción sin confirmar durante horas, mientras que una excesiva es un sobrecosto irrecuperable. Como el espacio de cada bloque es limitado, cuando la demanda supera la capacidad se forma una subasta implícita y el precio varía de forma considerable en cuestión de horas \cite{moser2015,easley2019,huberman2021}.
+
+El objetivo es determinar si, a partir del estado observable de la red hasta el bloque actual, es posible anticipar si la comisión del siguiente bloque será alta respecto al nivel vigente del mercado. El resultado no es un estimador de comisión completo, sino su primer componente: la estimación del nivel de precio, sobre la que un estimador operativo aplicaría la urgencia de cada usuario.
+
+\textbf{Tarea.} Sea $f_t$ la tasa mediana de comisión del bloque $t$. Se define el umbral móvil
+\begin{equation}
+\theta_t = P_{75}(f_{t-1007},\dots,f_t),
+\end{equation}
+y la etiqueta $y_t = 1$ si $f_{t+1} > \theta_t$, y $0$ en otro caso. La ventana de 1008 bloques equivale aproximadamente a una semana. \textbf{Desempeño:} F1 de la clase positiva como métrica principal, con precisión, exhaustividad (\textit{recall}), precisión promedio (AP) y ROC-AUC. Toda comparación se hace frente a la persistencia.
+
+En la primera entrega se plantearon tres hipótesis: \textbf{H1}, la tasa reciente es el predictor dominante; \textbf{H2}, los atributos de actividad de la red (número de transacciones y comisiones totales) aportan una mejora marginal, menor que la de la propia tasa; y \textbf{H3}, el desempeño se degrada en los episodios de mayor variación de las comisiones.
+
+\section{Datos y análisis exploratorio}
+Se utiliza \textit{Bitcoin Blockchain Historical Data} \cite{graterol_kaggle,graterol_github}: 810\,909 bloques con 13 variables agregadas, de enero de 2009 a octubre de 2023. Cada fila es un bloque; la variable de interés es \texttt{median\_fee\_rate}, en satoshis por byte. No hay valores faltantes ni duplicados. Se identificaron 2\,512 bloques con la mediana fuera del rango publicado $[\texttt{fee\_range\_min}, \texttt{fee\_range\_max}]$, una inconsistencia de la fuente, y 14\,572 retrocesos de la marca de tiempo, admitidos por el protocolo.
+
+\textbf{Periodo de estudio.} Antes de 2015--2016 los bloques casi nunca alcanzaban su capacidad (1.1\,\% en 2014 frente a 62.8\,\% en 2016) y la comisión no se fijaba por competencia; la correlación entre la tasa de un bloque y la del siguiente pasa de 0.09 en 2014 a valores entre 0.54 y 0.91 desde 2017 (Fig.~\ref{fig:ocupacion}). Por ello el estudio se restringe a los bloques desde el 1 de enero de 2016. Al descartar las 1007 filas sin ventana completa quedan 418\,720 ejemplos.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{ocupacion_por_anio.png}
+\caption{Ocupación de los bloques y correlación de la tasa con la del bloque siguiente, por año.}
+\label{fig:ocupacion}
+\end{figure}
+
+\textbf{Definición de la clase.} Un umbral fijo, estimado en entrenamiento (P75 = 79), dejaba solo un 0.32\,\% de positivos en validación, porque el nivel de las comisiones no es estacionario: la mediana anual pasa de 134 en 2017 a 8 en 2018. El umbral móvil mantiene la proporción de positivos cerca del diseño en las tres particiones (Tabla~\ref{tab:particion}), y el resultado es estable para ventanas de un día y de un mes.
+
+\begin{table}[htbp]
+\caption{Partición cronológica}
+\label{tab:particion}
+\centering
+\small
+\begin{tabular}{lrlr}
+\toprule
+Partición & Bloques & Periodo & Positivos \\
+\midrule
+Entrenamiento & 293\,104 & 2016-01 a 2021-05 & 24.65\,\% \\
+Validación & 62\,808 & 2021-05 a 2022-08 & 21.47\,\% \\
+Prueba & 62\,808 & 2022-08 a 2023-10 & 24.93\,\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Hallazgos para la predicción.} Cuando el bloque actual supera su umbral, el siguiente lo supera el 52.8\,\% de las veces; cuando no, solo el 15.5\,\% (Fig.~\ref{fig:transicion}). La proporción de positivos varía además entre 11.3\,\% los domingos y 32.4\,\% los jueves. Las correlaciones con la tasa siguiente son altas para la tasa actual (Spearman 0.71) y casi nulas para el tamaño del bloque (0.002), ya que desde 2016 casi todos los bloques están llenos.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{eda_posicion_relativa.png}
+\caption{Posición relativa de la tasa actual por clase y transición entre bloques consecutivos (entrenamiento).}
+\label{fig:transicion}
+\end{figure}
+
+\textbf{Fuga de información.} La partición es cronológica; el umbral solo usa bloques hasta $t$; la tasa del bloque siguiente solo construye la etiqueta; y todas las transformaciones se ajustan en entrenamiento. En la primera entrega se inspeccionó la proporción de clases en prueba para reformular el objetivo; esa exposición se declara, aunque la prueba no se usó para ajustar ningún modelo.
+
+\section{Preprocesamiento e ingeniería de características}
+Todas las variables usan información hasta el bloque actual, lo que se verificó perturbando bloques futuros y comprobando que las entradas no cambian. Se emplearon dos conjuntos:
+
+\begin{itemize}
+\item \textbf{Regresión logística (22 variables):} posición logarítmica de la tasa respecto al umbral, sus rezagos (1, 2, 3, 6), medias móviles (6, 144), volatilidad y tendencia; dispersión dentro del bloque; ocupación normalizada por el máximo de 4320 bloques, intervalo entre bloques y razones por transacción; y hora y día en seno y coseno. Imputación por mediana y estandarización dentro del \textit{pipeline}.
+\item \textbf{Modelos de árboles (33 variables):} las 11 columnas del bloque actual, el umbral local, la razón $(f_t+1)/(\theta_t+1)$, la razón promedio/mediana, rezagos (1, 6, 144), medias y desviaciones móviles (6, 144, 1008), razones por transacción, tamaño relativo al máximo de 1008 bloques, intervalo entre bloques (negativos como faltantes, con una bandera) y calendario cíclico. Imputación por mediana dentro de cada entrenamiento, sin escalamiento.
+\end{itemize}
+
+No se eliminaron valores extremos, porque pueden corresponder a episodios reales de congestión. La normalización de la ocupación por ventana móvil evita el cambio de escala introducido por SegWit en 2017.
+
+\section{Metodología y modelos}
+\textbf{Persistencia.} Predice para el bloque siguiente la clase del bloque actual, $\hat y_t = \mathbb{1}[f_t > \theta_t]$. No requiere entrenamiento y es la referencia que cualquier modelo debe superar.
+
+\textbf{Regresión logística.} Penalización L1 o L2, $C \in \{0.01, 0.1, 1, 10\}$ y pesos de clase nulos o balanceados (16 configuraciones). Se eligió L2, $C=1$, sin ponderación; las 16 configuraciones quedan dentro de 0.0003 de F1.
+
+\textbf{Random Forest (RF)} \cite{breiman2001}. 100 árboles, \texttt{max\_features=sqrt}, \textit{bootstrap} con la mitad de los ejemplos; tres combinaciones de profundidad y tamaño mínimo de hoja. Se eligió profundidad 20 y hoja mínima de 30.
+
+\textbf{HistGradientBoosting (HGB)} \cite{friedman2001}. Tres configuraciones de iteraciones, hojas, tasa de aprendizaje, hoja mínima y regularización L2, sin parada temprana interna para evitar una separación aleatoria. Se eligieron 180 iteraciones, 15 hojas, tasa 0.10, hoja mínima 80 y L2 de 5. Todo se implementó con scikit-learn \cite{sklearn} y semilla 42.
+
+\section{Diseño experimental y evaluación}
+Para RF y HGB, la selección usó tres folds de ventana expansiva dentro de entrenamiento, con 40\,000 ejemplos de validación interna y un margen (\textit{gap}) de 1008 bloques. Se eligió el candidato de mayor F1 medio y después el umbral de probabilidad que maximiza el F1 de las predicciones fuera de fold, en una malla de 0.10 a 0.90. Los modelos elegidos se reajustaron con las primeras 292\,096 filas de entrenamiento y se evaluaron una vez en validación. Para la regresión logística, la configuración y el umbral se seleccionaron sobre validación, por lo que su F1 de validación es optimista; la prueba se evaluó una sola vez después de fijar todas las decisiones.
+
+Se prioriza el F1 de la clase alta porque la exactitud es engañosa con un 25\,\% de positivos. La AP resume la curva precisión--exhaustividad sin depender del umbral. Para comparar conjuntos de variables se usó un \textit{bootstrap} emparejado por bloques móviles de 1008 bloques \cite{kunsch1989}, que respeta la dependencia entre bloques consecutivos.
+
+\section{Resultados}
+La Tabla~\ref{tab:resultados} reúne los cuatro métodos. En validación, RF y HGB superan a la persistencia en F1 (+0.024 y +0.032) y a la regresión logística en AP (+0.030 y +0.037). En prueba, la persistencia supera a la regresión logística en F1 (0.5763 frente a 0.5704), aunque esta discrimina claramente mejor que el azar: su AP es 0.617 frente a una tasa base de 0.249.
+
+\begin{table}[htbp]
+\caption{Resultados de los cuatro métodos. La persistencia solo emite etiquetas, por lo que no tiene AP ni ROC-AUC.}
+\label{tab:resultados}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccccc}
+\toprule
+Método & Part. & F1 & Prec. & Rec. & AP & ROC \\
+\midrule
+Persistencia & Val. & 0.5398 & 0.5405 & 0.5391 & -- & -- \\
+Logística & Val. & 0.5572 & 0.5157 & 0.6060 & 0.5929 & 0.8090 \\
+RF & Val. & 0.5638 & 0.5966 & 0.5344 & 0.6225 & 0.8171 \\
+HGB & Val. & 0.5713 & 0.5608 & 0.5823 & 0.6298 & 0.8217 \\
+\midrule
+Persistencia & Prueba & 0.5763 & 0.5770 & 0.5755 & -- & -- \\
+Logística & Prueba & 0.5704 & 0.5478 & 0.5950 & 0.6166 & 0.8061 \\
+RF & Prueba & \multicolumn{5}{c}{pendiente de la evaluación final} \\
+HGB & Prueba & \multicolumn{5}{c}{pendiente de la evaluación final} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\columnwidth]{curvas_pr.png}
+\caption{Curvas precisión--exhaustividad de RF y HGB en validación.}
+\label{fig:pr}
+\end{figure}
+
+Con los umbrales fijados en los folds (0.300 para RF y 0.350 para HGB), HGB detecta 645 positivos más que RF a cambio de 1\,277 falsos positivos adicionales. La importancia por reducción de impureza de RF está dominada por la tasa relativa al umbral (0.31), seguida por las medias móviles de la tasa; las variables de volumen quedan por debajo de 0.02. En la regresión logística, los mayores coeficientes corresponden a las medias móviles de 144 y 6 bloques y a la volatilidad reciente. Ambas medidas son descriptivas y están afectadas por la correlación entre variables.
+
+\subsection{Estudio de ablación}
+Para aislar el aporte de cada grupo de variables se entrenó un mismo HGB sencillo (150 iteraciones, 15 hojas, tasa 0.1) con cuatro subconjuntos de las 33 variables, con los mismos folds, \textit{gap} y criterio de umbral: A0, la tasa actual (3 variables); A, todas las de comisiones (16); B, comisiones y actividad de la red, incluidas las comisiones totales como en H2 (29); y C, todas (33). Los resultados en validación se muestran en la Tabla~\ref{tab:ablation} y la Fig.~\ref{fig:ablation}.
+
+\begin{table}[htbp]
+\caption{Ablación en validación. $\Delta$AP frente al conjunto anterior, con IC 95\,\% por \textit{bootstrap} de bloques.}
+\label{tab:ablation}
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccc}
+\toprule
+Conjunto & Var. & AP & F1 & $\Delta$AP [IC 95\,\%] \\
+\midrule
+A0: tasa actual & 3 & 0.536 & 0.539 & -- \\
+A: comisiones & 16 & 0.619 & 0.567 & +0.084 [0.070, 0.095] \\
+B: + actividad & 29 & 0.632 & 0.573 & +0.012 [0.008, 0.017] \\
+C: + calendario & 33 & 0.631 & 0.568 & $-$0.001 [$-$0.006, 0.004] \\
+Persistencia & -- & -- & 0.540 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{ablation_validacion.png}
+\caption{Ablación: AP y F1 en validación por conjunto de variables.}
+\label{fig:ablation}
+\end{figure}
+
+Con solo la tasa actual, el modelo obtiene el mismo F1 que la persistencia (0.539 frente a 0.540): reproduce la misma regla. La historia de las comisiones aporta la mayor mejora; la actividad de la red añade una mejora pequeña pero detectable también en F1 (+0.006, IC [0.001, 0.011]); y el calendario no aporta. El mismo orden se observa en los tres folds de entrenamiento.
+
+\subsection{Rendimiento por periodos y volatilidad}
+Por trimestre de validación, el F1 varía entre 0.50 y 0.64 de forma paralela en todos los métodos, siguiendo la proporción de positivos, y la ventaja de los modelos con historia de comisiones sobre la persistencia es positiva en todos los trimestres (+0.01 a +0.04). Según la volatilidad reciente (coeficiente de variación de las últimas 144 tasas, con terciles fijados en entrenamiento), el F1 del modelo con las 33 variables es 0.566, 0.575 y 0.548 en volatilidad baja, media y alta, y su AP es 0.629, 0.643 y 0.595.
+
+\subsection{Análisis de errores}
+El 19.8\,\% de los bloques de validación es un cambio de clase, y un episodio de comisión alta dura en promedio 2.17 bloques. La persistencia falla, por construcción, en todas esas transiciones. El modelo con las 33 variables anticipa el 39\,\% de los finales de episodio, pero solo el 14\,\% de los inicios, a cambio de errar en el 3.5\,\% de los tramos bajos estables y en el 10\,\% de los altos (Fig.~\ref{fig:transiciones}). Los errores se concentran cerca del umbral: la tasa de error es del 6\,\% cuando la tasa siguiente queda por debajo de la mitad del umbral y del 74\,\% cuando lo supera por menos del 5\,\%. Los falsos positivos son bloques actuales caros seguidos de uno algo más barato (margen mediano 0.80), y los falsos negativos, bloques baratos seguidos de uno que supera el umbral (1.25).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{errores_por_transicion.png}
+\caption{Tasa de error según la transición de clase en validación.}
+\label{fig:transiciones}
+\end{figure}
+
+\section{Discusión y limitaciones}
+La capacidad predictiva procede de la historia reciente de las comisiones y no del estado instantáneo de la red. El estado actual equivale a la persistencia; la mejora aparece al describir la tendencia y la inestabilidad recientes del precio, lo que es coherente con la importancia de RF y con los coeficientes de la regresión logística. Los árboles aprovechan mejor esa información que el modelo lineal, lo que sugiere relaciones no lineales entre la historia de la tasa y el bloque siguiente. La actividad de la red aporta poco porque, desde 2016, los bloques están casi siempre llenos: la congestión se manifiesta en el precio y no en el volumen. El calendario muestra señal en la regresión logística, pero no añade nada a los árboles una vez incluidas las medias móviles de 6 y 144 bloques, que ya recogen el ciclo diario; además, parte de esa señal procede de la propia ventana semanal del umbral.
+
+La ventaja sobre la persistencia es consistente pero modesta en F1. El análisis de errores lo explica: los episodios de comisión alta son muy cortos, y su inicio corresponde a la llegada de demanda nueva que todavía no se refleja en los bloques minados. Además, muchas etiquetas dependen de diferencias de uno o dos satoshis por byte respecto a un umbral que se mueve en cada bloque. Ambas condiciones fijan un techo al rendimiento alcanzable con estas variables, independientemente del algoritmo. La diferencia en AP es mayor que en F1: los modelos ordenan bien los bloques por riesgo, aunque un único umbral binario recorte parte de esa ventaja.
+
+\textbf{Limitaciones.} (i) No se dispone del \textit{mempool}, que la literatura considera central y que no puede reconstruirse retrospectivamente. (ii) Solo se observan transacciones confirmadas y agregadas por bloque. (iii) Los bloques consecutivos son dependientes; los intervalos de \textit{bootstrap} son aproximados y no se corrigen por comparaciones múltiples. (iv) La regresión logística y los árboles usan conjuntos de variables distintos (22 y 33), por lo que su comparación mezcla el efecto del algoritmo y el de las variables. (v) El umbral de la logística se ajustó en validación, cuya proporción de positivos (21.5\,\%) difiere de la de prueba (24.9\,\%). (vi) La validación contiene pocos episodios de alta volatilidad. (vii) El ablation usa un solo algoritmo con configuración fija. (viii) Los resultados corresponden a 2016--2023.
+
+\textbf{Consideraciones éticas.} El modelo no usa información personal, pero un uso operativo podría llevar a retrasar o adelantar transacciones con base en una predicción que falla con frecuencia justo al inicio de la congestión, cuando equivocarse cuesta más. Cualquier aplicación debería comunicar esa incertidumbre y no presentarse como un estimador completo de comisiones, ni generalizarse a otras redes o periodos sin una nueva validación.
+
+\section{Conclusiones}
+\textbf{H1} se confirma: la tasa reciente es el predictor dominante, aunque el estado actual por sí solo equivale a la persistencia y el valor aparece al incorporar la historia de las comisiones. \textbf{H2} se confirma: la actividad de la red aporta una mejora pequeña pero detectable (+0.012 de AP), muy inferior a la de la historia de comisiones (+0.084), y el calendario no aporta. \textbf{H3} se confirma parcialmente: el rendimiento disminuye en el tercil de mayor volatilidad de forma moderada, y la principal fuente de error son los cambios de clase, sobre todo el inicio de los episodios de comisión alta.
+
+La persistencia es una referencia difícil de superar: la regresión logística no lo logra en prueba, y los modelos de árboles la superan en validación por un margen modesto en F1 y mayor en AP. El límite principal no es el algoritmo, sino la información disponible. Como trabajo futuro se propone incorporar datos del \textit{mempool}, plantear la detección del inicio de episodios de congestión como tarea propia, evaluar horizontes mayores que un bloque y definir la clase con un margen alrededor del umbral que reduzca la ambigüedad de las etiquetas.
+
+\section*{Repositorio}
+El código, los notebooks y los resultados están disponibles en \url{https://github.com/naye-gg/bitcoin-block-fee-classification_ML_project} \cite{repo}.
+
+\begin{thebibliography}{00}
+\bibitem{graterol_kaggle} J. Graterol, ``Bitcoin Blockchain Historical Data,'' Kaggle. [Online]. Available: \url{https://www.kaggle.com/datasets/jesusgraterol/bitcoin-blockchain-dataset}
+\bibitem{graterol_github} J. Graterol, ``Bitcoin Blockchain Dataset Builder,'' GitHub. [Online]. Available: \url{https://github.com/jesusgraterol/bitcoin-blockchain-dataset-builder}
+\bibitem{moser2015} M. Möser and R. Böhme, ``Trends, tips, tolls: A longitudinal study of Bitcoin transaction fees,'' in \textit{Financial Cryptography and Data Security}, LNCS 8976, Springer, 2015, pp. 19--33.
+\bibitem{easley2019} D. Easley, M. O'Hara, and S. Basu, ``From mining to markets: The evolution of Bitcoin transaction fees,'' \textit{J. Financial Economics}, vol. 134, no. 1, pp. 91--109, 2019.
+\bibitem{huberman2021} G. Huberman, J. D. Leshno, and C. Moallemi, ``Monopoly without a monopolist: An economic analysis of the Bitcoin payment system,'' \textit{Rev. Economic Studies}, vol. 88, no. 6, pp. 3011--3040, 2021.
+\bibitem{breiman2001} L. Breiman, ``Random forests,'' \textit{Machine Learning}, vol. 45, no. 1, pp. 5--32, 2001.
+\bibitem{friedman2001} J. H. Friedman, ``Greedy function approximation: A gradient boosting machine,'' \textit{Ann. Statist.}, vol. 29, no. 5, pp. 1189--1232, 2001.
+\bibitem{sklearn} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in Python,'' \textit{J. Mach. Learn. Res.}, vol. 12, pp. 2825--2830, 2011.
+\bibitem{kunsch1989} H. R. Künsch, ``The jackknife and the bootstrap for general stationary observations,'' \textit{Ann. Statist.}, vol. 17, no. 3, pp. 1217--1241, 1989.
+\bibitem{repo} C. D. Ordinola Ortega, N. B. Guerrero Gutierrez, and A. C. Alvarado León, ``Bitcoin block fee classification,'' GitHub, 2026.
+\end{thebibliography}
+
+\end{document}

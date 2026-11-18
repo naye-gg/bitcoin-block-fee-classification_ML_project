@@ -3,10 +3,10 @@ C_todas,0→0 baja estable,43118,0.03522890672109096
 C_todas,1→1 alta estable,7283,0.10119456268021419
 C_todas,0→1 inicio de alza,6204,0.8557382333978079
 C_todas,1→0 fin de alza,6203,0.6072867967112687
-A_comisiones,0→0 baja estable,43118,0.06619045410269493
-A_comisiones,1→1 alta estable,7283,0.031580392695317865
-A_comisiones,0→1 inicio de alza,6204,0.7598323662153449
-A_comisiones,1→0 fin de alza,6203,0.8221828147670482
+A_comisiones,0→0 baja estable,43118,0.043438935015538756
+A_comisiones,1→1 alta estable,7283,0.06480845805300013
+A_comisiones,0→1 inicio de alza,6204,0.8284977433913604
+A_comisiones,1→0 fin de alza,6203,0.7364178623246816
 persistencia,0→0 baja estable,43118,0.0
 persistencia,1→1 alta estable,7283,0.0
 persistencia,0→1 inicio de alza,6204,1.0
