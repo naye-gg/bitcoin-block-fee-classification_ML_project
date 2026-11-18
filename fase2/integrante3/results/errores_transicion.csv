@@ -1,12 +1,12 @@
 conjunto,transicion,n,tasa_error
-C_todas,0→0 baja estable,43118,0.03522890672109096
-C_todas,1→1 alta estable,7283,0.10119456268021419
-C_todas,0→1 inicio de alza,6204,0.8557382333978079
-C_todas,1→0 fin de alza,6203,0.6072867967112687
-A_comisiones,0→0 baja estable,43118,0.043438935015538756
-A_comisiones,1→1 alta estable,7283,0.06480845805300013
-A_comisiones,0→1 inicio de alza,6204,0.8284977433913604
-A_comisiones,1→0 fin de alza,6203,0.7364178623246816
+C_todas,0→0 baja estable,43118,0.0485412124866645
+C_todas,1→1 alta estable,7283,0.08458053000137306
+C_todas,0→1 inicio de alza,6204,0.8088330109606705
+C_todas,1→0 fin de alza,6203,0.6540383685313558
+A_comisiones,0→0 baja estable,43118,0.07045781344218192
+A_comisiones,1→1 alta estable,7283,0.04489908004943018
+A_comisiones,0→1 inicio de alza,6204,0.7464539007092199
+A_comisiones,1→0 fin de alza,6203,0.792519748508786
 persistencia,0→0 baja estable,43118,0.0
 persistencia,1→1 alta estable,7283,0.0
 persistencia,0→1 inicio de alza,6204,1.0

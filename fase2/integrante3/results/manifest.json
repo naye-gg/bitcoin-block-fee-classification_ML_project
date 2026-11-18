@@ -3,11 +3,11 @@
   "seed": 42,
   "gap": 1008,
   "hgb": {
-    "max_iter": 150,
+    "max_iter": 180,
     "max_leaf_nodes": 15,
     "learning_rate": 0.1,
     "min_samples_leaf": 80,
-    "l2_regularization": 1.0
+    "l2_regularization": 5.0
   },
   "conjuntos": {
     "A0_tasa_actual": [
@@ -112,5 +112,5 @@
   "numpy": "2.2.6",
   "pandas": "2.3.2",
   "scikit_learn": "1.7.2",
-  "code_sha256": "b36d1a2455d6325149a34bb6014f46916d67572f2cd982413188210475a9be79"
+  "code_sha256": "f31bed530c4c80544225429bff7eeb74b0f54f7e1985c84310c79f929220eb10"
 }
