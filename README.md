@@ -18,7 +18,7 @@ Clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisi
 |---|---|---|---|---|
 | Persistencia | 0.540 | — | 0.576 | — |
 | Regresión logística | 0.557 | 0.593 | 0.570 | 0.617 |
-| Random Forest | 0.564 | 0.623 | 0.605 | 0.684 |
+| Random Forest | 0.564 | 0.622 | 0.605 | 0.684 |
 | HistGradientBoosting | 0.571 | 0.630 | 0.609 | 0.690 |
 
 - En prueba, RF (F1 0.6048) y HGB (0.6093) superan a la persistencia (0.5763); la logística (0.5704) no la supera. Son diferencias descriptivas, sin prueba de significancia.

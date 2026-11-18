@@ -228,7 +228,7 @@ HGB & \textbf{180 it., 15 hojas, $\eta$=0.10, L2=5} & \textbf{0.630} & 0.747 \\
 \end{tabular}
 \end{table}
 
-En la regresión logística, las 16 configuraciones quedaron dentro de 0.0003 de F1 tras ajustar el umbral; se eligió L2, $C=1$, sin ponderación. Con 288\,784 observaciones y 22 variables no hay margen de sobreajuste que la penalización deba corregir. El ajuste del umbral influyó mucho más que la regularización: con el corte de 0.5 el F1 era 0.417, y con el umbral ajustado (0.312) subió a 0.558.
+En la regresión logística, las 16 configuraciones quedaron dentro de 0.0003 de F1 tras ajustar el umbral; se eligió L2, $C=1$, sin ponderación. Con 288\,784 observaciones y 22 variables no hay margen de sobreajuste que la penalización deba corregir. El ajuste del umbral influyó mucho más que la regularización: con el corte de 0.5 el F1 era 0.417, y con el umbral ajustado (0.312) subió a 0.557.
 
 % =====================================================================
 \section{Diseño experimental y evaluación}
@@ -412,7 +412,7 @@ Los errores se concentran cerca del umbral (Fig.~\ref{fig:margen}). La tasa de e
 
 \textbf{Por qué los árboles superan a la logística.} Con variables de contenido similar, los árboles obtienen una AP mayor. Esto sugiere que la relación entre la historia de la tasa y la clase siguiente no es lineal: el efecto de una variable, como la volatilidad reciente, puede depender de qué tan cerca esté la tasa actual del umbral, una interacción que los árboles representan de forma natural. La logística, cuyas 16 configuraciones rinden igual, parece limitada por su forma funcional y no por la regularización. Entre los ensambles, HGB generaliza algo mejor que RF, con una brecha menor entre ajuste y validación.
 
-\textbf{Actividad de la red y calendario.} La actividad aporta poco porque, desde 2016, los bloques están casi siempre llenos: su tamaño y su número de transacciones varían poco, y la congestión se manifiesta en el precio y no en el volumen. El calendario muestra señal en la logística, pero no añade nada a los árboles una vez incluidas las medias móviles de 6 y 144 bloques, que ya recogen el ciclo diario. Además, parte de esa señal procede de la propia ventana semanal del umbral, por lo que no debe interpretarse como una propiedad del mercado.
+\textbf{Actividad de la red y calendario.} La actividad aporta poco porque, desde 2016, los bloques están casi siempre llenos: su tamaño y su número de transacciones varían poco, y la congestión se manifiesta en el precio y no en el volumen. El calendario muestra señal en la logística, pero no mejora la AP de los árboles una vez incluidas las medias móviles de 6 y 144 bloques, que ya recogen el ciclo diario. Además, parte de esa señal procede de la propia ventana semanal del umbral, por lo que no debe interpretarse como una propiedad del mercado.
 
 \textbf{Techo de rendimiento.} La ventaja sobre la persistencia es consistente pero modesta en F1. Los episodios de comisión alta son muy cortos, y su inicio corresponde a la llegada de demanda nueva que todavía no se refleja en los bloques minados. Además, muchas etiquetas dependen de diferencias de uno o dos satoshis por byte respecto a un umbral que se mueve en cada bloque. Ambas condiciones limitan el rendimiento alcanzable con estas variables, independientemente del algoritmo. La diferencia en AP es mayor que en F1: los modelos ordenan bien los bloques según su riesgo, aunque un único umbral binario recorte parte de esa ventaja.
 

@@ -2,7 +2,7 @@
 
 Alvarado León, Adriana Celeste.
 
-Análisis complementario a los modelos de integrante 2: *ablation study*, rendimiento por periodos, análisis de errores, limitaciones y estructura del informe IEEE. Se reutiliza sin cambios el protocolo de `../integrante2/PROTOCOLO.md` (target, particiones, gap y 33 características). El test queda reservado.
+Análisis complementario a los modelos de integrante 2: *ablation study*, rendimiento por periodos, análisis de errores, limitaciones y estructura del informe IEEE. Se reutiliza sin cambios el protocolo de `../integrante2/PROTOCOLO.md` (target, particiones, gap y 33 características). Este análisis no usa el test; la evaluación final en prueba está en `../integrante2/results/test_final/`.
 
 ## Preguntas que responde
 
