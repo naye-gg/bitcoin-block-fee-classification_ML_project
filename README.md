@@ -13,10 +13,24 @@ REPOSITORIO
 ├── docs/
 │   ├── main.tex
 │   └── utec_logo.png
-└── eda/
-    ├── dataset.csv
-    ├── 01_eda.ipynb
-    └── requirements.txt
+├── eda/
+│   ├── dataset.csv
+│   ├── 01_eda.ipynb
+│   └── requirements.txt
+└── fase2/
+    └── integrante1/
+        ├── README.md
+        ├── BITACORA.md
+        ├── VERIFICACION.md
+        ├── requirements.txt
+        ├── notebooks/
+        │   └── 01_baselines.ipynb
+        ├── paper/
+        │   └── secciones_integrante1.md
+        └── results/
+            ├── baselines_resultados.csv
+            ├── busqueda_logistica.csv
+            └── figures/
 ```
 
 ## Dataset
@@ -58,6 +72,14 @@ python -m pip install -r eda/requirements.txt
 Abrir `eda/01_eda.ipynb` en VS Code/Jupyter, seleccionar el entorno `.venv` y ejecutar las celdas en orden. El directorio de trabajo debe ser `eda/`, porque el notebook carga directamente `pd.read_csv("dataset.csv")`.
 
 El notebook ya contiene las salidas de una ejecución completa. No necesita internet para analizar el dataset.
+
+## Fase 2
+
+[fase2/integrante1/](fase2/integrante1/) contiene la parte de EDA orientado a la predicción, baselines
+(persistencia y regresión logística) y redacción de las secciones de problema, datos, EDA y
+metodología de baselines. Su [README](fase2/integrante1/README.md) resume los resultados y las
+instrucciones de ejecución. El notebook lee directamente [eda/dataset.csv](eda/dataset.csv), sin
+copias del dataset.
 
 ## Propuesta
 
