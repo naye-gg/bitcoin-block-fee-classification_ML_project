@@ -27,59 +27,163 @@
 \titlepage
 \end{frame}
 
-% ---------------- Carlos: problema, datos y baselines (≈3 min) ----------------
+\begin{frame}{Contenido}
+\begin{columns}[T]
+\column{0.33\textwidth}
+\textbf{Carlos} ($\approx$3.5 min)
+\begin{enumerate}
+\item Problema y formulación
+\item Datos y periodo de estudio
+\item Variable objetivo
+\item Hallazgos del EDA
+\item Referencias: persistencia y logística
+\end{enumerate}
+\column{0.33\textwidth}
+\textbf{Nayeli} ($\approx$3 min)
+\begin{enumerate}\setcounter{enumi}{5}
+\item Variables y preprocesamiento
+\item Ensambles y diseño experimental
+\item Resultados comparativos
+\item Interpretación de variables
+\end{enumerate}
+\column{0.33\textwidth}
+\textbf{Adriana} ($\approx$3.5 min)
+\begin{enumerate}\setcounter{enumi}{9}
+\item Ablation
+\item Periodos y volatilidad
+\item Análisis de errores
+\item Discusión y limitaciones
+\item Conclusiones
+\end{enumerate}
+\end{columns}
+\end{frame}
+
+% ======================= Carlos =======================
 \begin{frame}{El problema}
 \begin{itemize}
 \item El espacio de cada bloque es limitado: las transacciones compiten pagando comisiones.
 \item Pagar poco implica esperar horas; pagar de más es un costo irrecuperable.
-\item \textbf{Tarea:} dado el bloque $t$, predecir si la tasa mediana del bloque $t+1$ superará el percentil 75 de las últimas 1008 tasas (una semana).
-\[ y_t = 1 \iff f_{t+1} > P_{75}(f_{t-1007},\dots,f_t) \]
-\item \textbf{Métrica principal:} F1 de la clase alta. Referencia: \textbf{persistencia} (``el siguiente bloque será como el actual'').
-\item \textbf{Hipótesis:} H1 la tasa reciente domina; H2 la actividad de la red aporta poco; H3 el modelo empeora con alta volatilidad.
+\item \textbf{Tarea:} dado el bloque $t$, predecir si la tasa mediana del bloque $t+1$ superará el percentil 75 de las últimas 1008 tasas (una semana):
+\[ y_t = 1 \iff f_{t+1} > \theta_t = P_{75}(f_{t-1007},\dots,f_t) \]
+\item \textbf{Métrica principal:} F1 de la clase alta; también precisión, \textit{recall}, AP y ROC-AUC.
+\item \textbf{Hipótesis de P1:}
+\begin{itemize}
+\item H1: la tasa reciente es el predictor dominante.
+\item H2: la actividad de la red (transacciones, comisiones totales) aporta una mejora marginal.
+\item H3: el desempeño empeora cuando las comisiones varían más.
+\end{itemize}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Datos y decisiones de P1}
+\begin{frame}{Datos y periodo de estudio}
 \begin{columns}[T]
-\column{0.5\textwidth}
+\column{0.45\textwidth}
 \small
 \begin{itemize}
-\item 810\,909 bloques (Kaggle, 2009--2023), 13 variables por bloque.
-\item Desde 2016 los bloques se llenan y aparece la competencia por comisión $\Rightarrow$ estudio desde 2016.
-\item Umbral fijo: 0.32\,\% de positivos en validación. Umbral móvil: 24.7 / 21.5 / 24.9\,\%.
-\item Partición cronológica 70/15/15: 418\,720 ejemplos.
+\item 810\,909 bloques (Kaggle, 2009--2023), 13 variables agregadas por bloque.
+\item Sin faltantes ni duplicados; 2\,512 bloques con la mediana fuera del rango publicado (error de la fuente).
+\item Antes de 2016 los bloques casi nunca se llenaban: no había competencia por comisión.
+\item $\Rightarrow$ Estudio desde el 1 de enero de 2016: \textbf{418\,720 ejemplos}.
 \end{itemize}
-\column{0.5\textwidth}
+\column{0.55\textwidth}
 \includegraphics[width=\textwidth]{ocupacion_por_anio.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{¿Por qué un umbral móvil?}
+\begin{columns}[T]
+\column{0.55\textwidth}
+\includegraphics[width=\textwidth]{nivel_trimestral_umbral_fijo.png}
+\column{0.45\textwidth}
+\small
+\begin{itemize}
+\item Con un umbral fijo (79 sat/byte), validación tenía solo \textbf{0.32\,\%} de positivos.
+\item El nivel de las comisiones no es estacionario: mediana de 134 en 2017 y de 8 en 2018.
+\item Umbral móvil semanal: 24.7 / 21.5 / 24.9\,\% de positivos en train / validación / prueba.
+\item Partición \textbf{cronológica} 70/15/15, sin mezclar el orden.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Hallazgos del EDA para la predicción}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{eda_posicion_relativa.png}\par
+\small Si el bloque actual es alto, el siguiente también lo es el 52.8\,\% de las veces (15.5\,\% si no).
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{eda_calendario.png}\par
+\small Positivos: 11.3\,\% los domingos frente a 32.4\,\% los jueves. Parte se debe a la ventana semanal del umbral.
 \end{columns}
 \end{frame}
 
 \begin{frame}{Referencias: persistencia y regresión logística}
 \begin{columns}[T]
-\column{0.48\textwidth}
+\column{0.42\textwidth}
 \small
 \begin{itemize}
-\item Si el bloque actual es ``alto'', el siguiente también lo es el 52.8\,\% de las veces (15.5\,\% si no).
-\item Logística L2 con 22 variables, umbral ajustado en validación.
+\item \textbf{Persistencia:} ``el siguiente bloque será como el actual''.
+\item \textbf{Logística} L2 con 22 variables; las 16 configuraciones rinden igual.
+\item Ajustar el umbral pesa más que regularizar: F1 0.417 $\rightarrow$ 0.558.
 \item \textbf{En prueba, la persistencia gana:} F1 0.576 frente a 0.570.
-\item La logística sí discrimina (AP 0.617 frente a 0.249 de tasa base), pero no supera la inercia del mercado.
+\item La logística sí discrimina (AP 0.617 frente a 0.249 de tasa base).
 \end{itemize}
-\column{0.52\textwidth}
-\includegraphics[width=\textwidth]{eda_posicion_relativa.png}
+\column{0.58\textwidth}
+\includegraphics[width=\textwidth]{pr_y_matriz_confusion.png}
 \end{columns}
 \end{frame}
 
-% ---------------- Nayeli: ensambles y diseño experimental (≈3 min) ----------------
-\begin{frame}{Modelos de ensamble y diseño experimental}
+% ======================= Nayeli =======================
+\begin{frame}{Variables y preprocesamiento}
 \begin{itemize}
-\item \textbf{Random Forest} (bagging) e \textbf{HistGradientBoosting} (boosting) con 33 variables causales: rezagos, medias y desviaciones móviles de la tasa, actividad y calendario.
-\item Tres folds de \textbf{ventana expansiva} dentro de entrenamiento, con \textit{gap} de 1008 bloques.
-\item Búsqueda acotada: 3 configuraciones por familia; umbral de decisión elegido con predicciones fuera de fold.
-\item Reajuste final y una sola evaluación en validación. El test se reserva.
+\item Todas las variables usan solo información \textbf{hasta el bloque actual} (verificado perturbando bloques futuros).
+\item \textbf{33 variables} para los árboles:
+\begin{itemize}
+\item Comisiones relativas al umbral: $(f_t+1)/(\theta_t+1)$, razón promedio/mediana.
+\item Rezagos (1, 6, 144) y medias y desviaciones móviles (6, 144, 1008) de la tasa.
+\item Actividad: tamaño, transacciones, entradas y salidas por transacción, intervalo entre bloques.
+\item Calendario: hora y día en seno y coseno.
+\end{itemize}
+\item Imputación por mediana ajustada solo en entrenamiento; sin escalamiento para árboles.
+\item Ocupación relativa al máximo de una ventana móvil (SegWit cambió la capacidad en 2017).
+\item Sin eliminar extremos: pueden ser congestión real.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Resultados}
+\begin{frame}{Ensambles y diseño experimental}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\small
+\begin{itemize}
+\item \textbf{Random Forest} (\textit{bagging}) e \textbf{HistGradientBoosting} (\textit{boosting}).
+\item Tres folds de \textbf{ventana expansiva} con \textit{gap} de 1008 bloques.
+\item 3 configuraciones por familia; umbral elegido con predicciones fuera de fold.
+\item Reajuste final y una sola evaluación en validación.
+\end{itemize}
+\column{0.5\textwidth}
+\footnotesize
+\begin{tabular}{llc}
+\toprule
+Modelo & Configuración elegida & F1 CV \\
+\midrule
+RF & prof. 20, hoja 30 & 0.589 \\
+HGB & 180 it., 15 hojas, $\eta$=0.10 & 0.630 \\
+\bottomrule
+\end{tabular}
+\vspace{0.3cm}
+
+\begin{tabular}{cll}
+\toprule
+Fold & Ajuste & Validación \\
+\midrule
+1 & 2016-01 a 2019-02 & 2019-03 a 2019-11 \\
+2 & 2016-01 a 2019-11 & 2019-11 a 2020-08 \\
+3 & 2016-01 a 2020-08 & 2020-08 a 2021-05 \\
+\bottomrule
+\end{tabular}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Resultados comparativos}
 \begin{columns}[T]
 \column{0.52\textwidth}
 \small
@@ -95,14 +199,26 @@ HGB & 0.571 & 0.630 & pend. \\
 \end{tabular}
 \vspace{0.3cm}
 \begin{itemize}
-\item Los árboles superan a las referencias en validación: +0.03 de F1 frente a la persistencia y +0.04 de AP frente a la logística.
+\item En validación, los árboles superan a la persistencia (+0.03 de F1) y a la logística (+0.04 de AP).
+\item HGB detecta 645 positivos más que RF, con 1\,277 falsos positivos adicionales.
 \end{itemize}
 \column{0.48\textwidth}
 \includegraphics[width=\textwidth]{curvas_pr.png}
 \end{columns}
 \end{frame}
 
-% ---------------- Adriana: ablation, errores y conclusiones (≈4 min) ----------------
+\begin{frame}{Generalización e interpretación de variables}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{brecha_generalizacion.png}\par
+\small F1 en ajuste frente a validación: RF 0.632 $\rightarrow$ 0.564; HGB 0.582 $\rightarrow$ 0.571. RF sobreajusta más.
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{importancia_rf_mdi.png}\par
+\small RF: domina la tasa relativa al umbral (0.31). Logística: medias móviles y volatilidad. Medidas descriptivas, no causales.
+\end{columns}
+\end{frame}
+
+% ======================= Adriana =======================
 \begin{frame}{Ablation: ¿qué información aporta cada grupo?}
 \begin{columns}[T]
 \column{0.42\textwidth}
@@ -110,9 +226,9 @@ HGB & 0.571 & 0.630 & pend. \\
 Mismo HGB, mismos folds, cuatro conjuntos de variables:
 \begin{itemize}
 \item \textbf{A0} tasa actual (3): igual a la persistencia.
-\item \textbf{A} + historia de comisiones: \textbf{+0.084 AP}.
-\item \textbf{B} + actividad de la red: +0.012 AP.
-\item \textbf{C} + calendario: sin mejora.
+\item \textbf{A} + historia de comisiones (16): \textbf{+0.084 AP}.
+\item \textbf{B} + actividad de la red (29): +0.012 AP.
+\item \textbf{C} + calendario (33): sin mejora.
 \end{itemize}
 IC 95\,\% por \textit{bootstrap} de bloques semanales.\\[0.2cm]
 $\Rightarrow$ \textbf{H1 y H2 se confirman.}
@@ -121,45 +237,62 @@ $\Rightarrow$ \textbf{H1 y H2 se confirman.}
 \end{columns}
 \end{frame}
 
-\begin{frame}{¿Dónde se equivocan los modelos?}
+\begin{frame}{Rendimiento por periodos y volatilidad (H3)}
 \begin{columns}[T]
-\column{0.42\textwidth}
-\small
-\begin{itemize}
-\item Un episodio de comisión alta dura \textbf{2.2 bloques} en promedio; el 20\,\% de los bloques es un cambio de clase.
-\item El modelo anticipa el 39\,\% de los finales, pero solo el \textbf{14\,\% de los inicios}.
-\item El inicio es demanda nueva en el \textit{mempool}, que el dataset no registra.
-\item Volatilidad alta: F1 0.548 frente a 0.566--0.575 $\Rightarrow$ \textbf{H3 parcial}.
-\end{itemize}
-\column{0.58\textwidth}
-\includegraphics[width=\textwidth]{errores_por_transicion.png}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{f1_por_trimestre.png}\par
+\small El F1 sube y baja igual en todos los métodos, siguiendo la proporción de positivos. Ventaja sobre la persistencia en todos los trimestres.
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{f1_por_volatilidad.png}\par
+\small Volatilidad alta: F1 0.548 frente a 0.566--0.575. Degradación moderada $\Rightarrow$ \textbf{H3 parcial}.
 \end{columns}
 \end{frame}
 
-\begin{frame}{Los errores se concentran cerca del umbral}
-\centering
-\includegraphics[height=0.62\textheight]{errores_por_margen.png}\par
-\small Cuando el bloque siguiente supera el umbral por menos del 5\,\%, el error es del 74\,\%: la frontera de la clase pone un techo al rendimiento.
+\begin{frame}{¿Dónde se equivocan los modelos?}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{errores_por_transicion.png}\par
+\small Un episodio alto dura \textbf{2.2 bloques}; el 20\,\% de los bloques es un cambio de clase. Se anticipa el 39\,\% de los finales, pero solo el \textbf{14\,\% de los inicios}.
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{errores_por_margen.png}\par
+\small Si el bloque siguiente supera el umbral por menos del 5\,\%, el error es del 74\,\%: la frontera de la clase pone un techo.
+\end{columns}
 \end{frame}
 
-\begin{frame}{Limitaciones y ética}
+\begin{frame}{Discusión, limitaciones y ética}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\small
+\textbf{Discusión}
 \begin{itemize}
-\item Sin datos del \textit{mempool}; solo transacciones confirmadas y agregadas por bloque.
-\item Bloques consecutivos dependientes: intervalos aproximados.
-\item Logística y árboles usan conjuntos de variables distintos (22 y 33).
-\item Validación con pocos episodios de alta volatilidad; periodo 2016--2023.
-\item \textbf{Ética:} una predicción que falla al inicio de la congestión podría inducir malas decisiones; debe comunicarse su incertidumbre y no presentarse como estimador completo.
+\item El valor está en la \textbf{historia} de las comisiones, no en el estado instantáneo.
+\item Los árboles captan relaciones no lineales que la logística no puede.
+\item La actividad aporta poco: desde 2016 los bloques están casi siempre llenos.
+\item El inicio de la congestión es demanda nueva en el \textit{mempool}, que el dataset no registra.
 \end{itemize}
+\column{0.5\textwidth}
+\small
+\textbf{Limitaciones}
+\begin{itemize}
+\item Sin \textit{mempool}; datos agregados y solo confirmados.
+\item Bloques dependientes: intervalos aproximados.
+\item Logística y árboles usan variables distintas (22 y 33).
+\item Validación con poca volatilidad; periodo 2016--2023.
+\end{itemize}
+\textbf{Ética:} una predicción que falla al inicio de la congestión puede inducir malas decisiones; debe comunicarse su incertidumbre.
+\end{columns}
 \end{frame}
 
 \begin{frame}{Conclusiones}
 \begin{itemize}
+\item \textbf{H1 se confirma:} la tasa reciente domina, pero el valor aparece con su historia (+0.084 AP).
+\item \textbf{H2 se confirma:} la actividad de la red aporta poco (+0.012 AP); el calendario, nada.
+\item \textbf{H3 parcial:} empeora algo con alta volatilidad; el error principal son los inicios de los episodios.
 \item La persistencia es una referencia difícil: la logística no la supera en prueba.
-\item El valor predictivo está en la \textbf{historia reciente de las comisiones}, no en el estado instantáneo ni en el volumen de la red.
 \item El límite principal no es el algoritmo, sino la \textbf{información disponible}.
 \item \textbf{Trabajo futuro:} datos del \textit{mempool}, detectar el inicio de la congestión como tarea propia, horizontes mayores y clases con margen alrededor del umbral.
 \end{itemize}
-\vspace{0.4cm}
+\vspace{0.3cm}
 \centering\small Repositorio: \url{github.com/naye-gg/bitcoin-block-fee-classification_ML_project}
 \end{frame}
 
