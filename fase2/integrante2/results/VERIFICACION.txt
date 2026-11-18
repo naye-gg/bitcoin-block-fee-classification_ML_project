@@ -1,0 +1,13 @@
+Verificación de la entrega
+
+1. Fuente y hash del CSV coinciden con P1.
+2. Ventana inclusiva de 1008 bloques y target del bloque siguiente comprobados.
+3. Características invariantes ante cambio de futuro y truncado de prefijos.
+4. Cortes y prevalencias de train/validación reproducen P1.
+5. Búsqueda completa: 18 ajustes; dos modelos finales sobre train con gap.
+6. Métricas recalculadas desde los CSV de predicciones; mismos índices y etiquetas en ambos modelos.
+7. Once celdas Python del notebook ejecutadas secuencialmente, cargando resultados completos; cinco figuras embebidas. No se verificó una sesión interactiva de Jupyter.
+8. Figuras principales inspeccionadas visualmente.
+9. El test no fue evaluado. La selección de características debe armonizarse con el equipo.
+
+Revisión posterior: retirado el análisis de permutación temporal; se conserva MDI de RF según la sesión 09b. Modelos y métricas sin cambios.

@@ -80,3 +80,10 @@ El artículo P1 definitivo se adaptará al template IEEE exigido por el curso.
 3. Alvarado León, Adriana Celeste - 202420154
 
 Repositorio: https://github.com/naye-gg/bitcoin-block-fee-classification_ML_project
+
+
+## Fase 2 — Integrante 2
+
+[Notebook de Random Forest e HistGradientBoosting](fase2/integrante2/notebooks/02_models.ipynb), con resultados de validación, figuras y secciones del paper.
+
+Ver [instrucciones](fase2/integrante2/README.md) y [protocolo común propuesto](fase2/integrante2/PROTOCOLO.md). El test permanece reservado; falta integrar los baselines y acordar las características con el equipo.

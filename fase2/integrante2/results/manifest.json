@@ -1,0 +1,73 @@
+{
+  "dataset_sha256": "408620117782d1eb68a38eda4c2b2f6cdfc23ccedd6999ca8740d222a835ac6e",
+  "source_commit": "7fbe2058c800eb5726f557b49e340bca4e338296",
+  "python": "3.13.13",
+  "numpy": "2.2.6",
+  "pandas": "2.3.2",
+  "scikit_learn": "1.7.2",
+  "seed": 42,
+  "gap": 1008,
+  "fit_rows": 292096,
+  "test_evaluado": false,
+  "features": [
+    "size",
+    "tx_count",
+    "difficulty",
+    "median_fee_rate",
+    "avg_fee_rate",
+    "total_fees",
+    "fee_range_min",
+    "fee_range_max",
+    "input_count",
+    "output_count",
+    "output_amount",
+    "umbral_local",
+    "fee_relativa",
+    "ratio_avg_mediana",
+    "fee_lag_1",
+    "fee_lag_6",
+    "fee_lag_144",
+    "fee_media_6",
+    "fee_std_6",
+    "fee_media_144",
+    "fee_std_144",
+    "fee_media_1008",
+    "fee_std_1008",
+    "size_por_tx",
+    "input_count_por_tx",
+    "output_count_por_tx",
+    "size_relativo_1008",
+    "intervalo_negativo",
+    "intervalo_segundos",
+    "hora_sin",
+    "hora_cos",
+    "dia_semana_sin",
+    "dia_semana_cos"
+  ],
+  "seleccion": {
+    "RandomForest": {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "min_samples_leaf": 30
+      },
+      "candidato": 1,
+      "threshold": 0.3,
+      "f1_cv_05": 0.5890472353688826
+    },
+    "HistGradientBoosting": {
+      "params": {
+        "max_iter": 180,
+        "max_leaf_nodes": 15,
+        "learning_rate": 0.1,
+        "min_samples_leaf": 80,
+        "l2_regularization": 5.0
+      },
+      "candidato": 2,
+      "threshold": 0.35,
+      "f1_cv_05": 0.6301184790574365
+    }
+  },
+  "code_sha256": "301d84eada16e6bf96d570186677006d0515a926250dedf4d807ce1eb676cc32",
+  "nota_ejecucion": "Modelos y predicciones de la ejecuci\u00f3n original. Se retir\u00f3 \u00fanicamente el an\u00e1lisis posterior de permutaci\u00f3n para alinear la entrega al curso; no cambiaron entrenamiento, selecci\u00f3n, caracter\u00edsticas, predicciones ni m\u00e9tricas. Notebook vuelto a ejecutar sobre resultados guardados."
+}

@@ -1,0 +1,13 @@
+RESULTADOS DE VALIDACIÓN — INTEGRANTE 2
+
+No se evaluó test. Faltan integrar los baselines del integrante 1.
+
+RandomForest: F1=0.5638; precision=0.5966; recall=0.5344; AP=0.6225; ROC-AUC=0.8171; umbral=0.300.
+Configuración: {"n_estimators": 100, "max_depth": 20, "min_samples_leaf": 30}
+HistGradientBoosting: F1=0.5713; precision=0.5608; recall=0.5823; AP=0.6298; ROC-AUC=0.8217; umbral=0.350.
+Configuración: {"max_iter": 180, "max_leaf_nodes": 15, "learning_rate": 0.1, "min_samples_leaf": 80, "l2_regularization": 5.0}
+
+Diferencia F1 HGB−RF: +0.0075. No equivale a significancia estadística.
+El código y PROTOCOLO.md fijan 33 predictores. Acordarlos con el equipo antes de comparar algoritmos.
+La partición de validación empieza en height 685293; test empieza en height 748101.
+Los modelos se ajustan hasta la fila 292095 de desarrollo (292096 ejemplos), con un gap de 1008.

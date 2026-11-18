@@ -1,0 +1,24 @@
+{
+  "RandomForest": {
+    "params": {
+      "n_estimators": 100,
+      "max_depth": 20,
+      "min_samples_leaf": 30
+    },
+    "candidato": 1,
+    "threshold": 0.3,
+    "f1_cv_05": 0.5890472353688826
+  },
+  "HistGradientBoosting": {
+    "params": {
+      "max_iter": 180,
+      "max_leaf_nodes": 15,
+      "learning_rate": 0.1,
+      "min_samples_leaf": 80,
+      "l2_regularization": 5.0
+    },
+    "candidato": 2,
+    "threshold": 0.35,
+    "f1_cv_05": 0.6301184790574365
+  }
+}

@@ -1,0 +1,9 @@
+numpy==2.2.6
+pandas==2.3.2
+scipy==1.16.2
+scikit-learn==1.7.2
+matplotlib==3.10.6
+threadpoolctl==3.6.0
+ipython>=9,<10
+nbformat>=5.10,<6
+jupyterlab>=4,<5
