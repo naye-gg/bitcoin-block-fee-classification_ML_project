@@ -51,10 +51,10 @@ ETIQUETAS = {
 COLORES = {'A0_tasa_actual': '#2a78d6', 'A_comisiones': '#eb6834',
            'B_comisiones_actividad': '#1baf7a', 'C_todas': '#eda100', 'persistencia': '#8a8984'}
 
-# Configuración única y sencilla: el objetivo es aislar el efecto de las variables,
-# no competir con la búsqueda de integrante 2.
-HGB = {'max_iter': 150, 'max_leaf_nodes': 15, 'learning_rate': 0.1,
-       'min_samples_leaf': 80, 'l2_regularization': 1.0}
+# Configuración ganadora de integrante 2 (results/seleccion.json), fija en todos
+# los conjuntos para aislar el efecto de las variables.
+HGB = {'max_iter': 180, 'max_leaf_nodes': 15, 'learning_rate': 0.1,
+       'min_samples_leaf': 80, 'l2_regularization': 5.0}
 UMBRALES = np.round(np.arange(.10, .901, .025), 3)
 N_BOOT, BLOQUE = 1000, 1008
 

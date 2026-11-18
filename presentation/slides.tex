@@ -123,7 +123,7 @@
 \begin{itemize}
 \item \textbf{Persistencia:} ``el siguiente bloque será como el actual''.
 \item \textbf{Logística} L2 con 22 variables; las 16 configuraciones rinden igual.
-\item Ajustar el umbral pesa más que regularizar: F1 0.417 $\rightarrow$ 0.558.
+\item Ajustar el umbral pesa más que regularizar: F1 0.417 $\rightarrow$ 0.557.
 \item \textbf{En prueba, la persistencia gana:} F1 0.576 frente a 0.570.
 \item La logística sí discrimina (AP 0.617 frente a 0.249 de tasa base).
 \end{itemize}
@@ -193,13 +193,13 @@ Método & F1 val. & AP val. & F1 prueba \\
 \midrule
 Persistencia & 0.540 & -- & 0.576 \\
 Logística & 0.557 & 0.593 & 0.570 \\
-Random Forest & 0.564 & 0.623 & 0.605 \\
+Random Forest & 0.564 & 0.622 & 0.605 \\
 HGB & 0.571 & 0.630 & 0.609 \\
 \bottomrule
 \end{tabular}
 \vspace{0.3cm}
 \begin{itemize}
-\item En validación, los árboles superan a la persistencia (+0.03 de F1) y a la logística (+0.04 de AP).
+\item En validación, los árboles superan a la persistencia (+0.03 de F1) y a la logística (+0.03--0.04 de AP).
 \item En prueba: RF/HGB ganan +0.029/+0.033 de F1 frente a persistencia; AP 0.684/0.690.
 \item Mismos ajustes y umbrales; sin reajuste con validación ni selección con prueba.
 \end{itemize}
@@ -224,12 +224,12 @@ HGB & 0.571 & 0.630 & 0.609 \\
 \begin{columns}[T]
 \column{0.42\textwidth}
 \small
-Mismo HGB, mismos folds, cuatro conjuntos de variables:
+El HGB ganador, mismos folds, cuatro conjuntos de variables:
 \begin{itemize}
 \item \textbf{A0} tasa actual (3): igual a la persistencia.
-\item \textbf{A} + historia de comisiones (16): \textbf{+0.084 AP}.
-\item \textbf{B} + actividad de la red (29): +0.012 AP.
-\item \textbf{C} + calendario (33): sin mejora.
+\item \textbf{A} + historia de comisiones (16): \textbf{+0.088 AP}.
+\item \textbf{B} + actividad de la red (29): +0.007 AP.
+\item \textbf{C} + calendario (33): sin mejora en AP.
 \end{itemize}
 IC 95\,\% por \textit{bootstrap} de bloques semanales.\\[0.2cm]
 $\Rightarrow$ \textbf{H1 y H2 se confirman.}
@@ -245,7 +245,7 @@ $\Rightarrow$ \textbf{H1 y H2 se confirman.}
 \small El F1 sube y baja igual en todos los métodos, siguiendo la proporción de positivos. Ventaja sobre la persistencia en todos los trimestres.
 \column{0.5\textwidth}
 \includegraphics[width=\textwidth]{f1_por_volatilidad.png}\par
-\small Volatilidad alta: F1 0.548 frente a 0.566--0.575. Degradación moderada $\Rightarrow$ \textbf{H3 parcial}.
+\small Volatilidad alta: F1 0.554 frente a 0.567--0.582. Degradación moderada $\Rightarrow$ \textbf{H3 parcial}.
 \end{columns}
 \end{frame}
 
@@ -253,10 +253,10 @@ $\Rightarrow$ \textbf{H1 y H2 se confirman.}
 \begin{columns}[T]
 \column{0.5\textwidth}
 \includegraphics[width=\textwidth]{errores_por_transicion.png}\par
-\small Un episodio alto dura \textbf{2.2 bloques}; el 20\,\% de los bloques es un cambio de clase. Se anticipa el 39\,\% de los finales, pero solo el \textbf{14\,\% de los inicios}.
+\small Un episodio alto dura \textbf{2.2 bloques}; el 20\,\% de los bloques es un cambio de clase. Se anticipa el 35\,\% de los finales, pero solo el \textbf{19\,\% de los inicios}.
 \column{0.5\textwidth}
 \includegraphics[width=\textwidth]{errores_por_margen.png}\par
-\small Si el bloque siguiente supera el umbral por menos del 5\,\%, el error es del 74\,\%: la frontera de la clase pone un techo.
+\small Si el bloque siguiente supera el umbral por menos del 5\,\%, el error es del 72\,\%: la frontera de la clase pone un techo.
 \end{columns}
 \end{frame}
 
@@ -286,8 +286,8 @@ $\Rightarrow$ \textbf{H1 y H2 se confirman.}
 
 \begin{frame}{Conclusiones}
 \begin{itemize}
-\item \textbf{H1 se confirma:} la tasa reciente domina, pero el valor aparece con su historia (+0.084 AP).
-\item \textbf{H2 se confirma:} la actividad de la red aporta poco (+0.012 AP); el calendario, nada.
+\item \textbf{H1 se confirma:} la tasa reciente domina, pero el valor aparece con su historia (+0.088 AP).
+\item \textbf{H2 se confirma:} la actividad de la red aporta poco (+0.007 AP); el calendario, nada.
 \item \textbf{H3 parcial:} empeora algo con alta volatilidad; el error principal son los inicios de los episodios.
 \item En prueba, RF y HGB superan a persistencia (F1 0.605/0.609 frente a 0.576); la logística no. Diferencias descriptivas, sin prueba de significancia.
 \item El límite principal no es el algoritmo, sino la \textbf{información disponible}.

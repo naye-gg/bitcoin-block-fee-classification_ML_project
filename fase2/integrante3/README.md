@@ -2,7 +2,7 @@
 
 Alvarado León, Adriana Celeste.
 
-Análisis complementario a los modelos de integrante 2: *ablation study*, rendimiento por periodos, análisis de errores, limitaciones y estructura del informe IEEE. Se reutiliza sin cambios el protocolo de `../integrante2/PROTOCOLO.md` (target, particiones, gap y 33 características). El test queda reservado.
+Análisis complementario a los modelos de integrante 2: *ablation study*, rendimiento por periodos, análisis de errores, limitaciones y estructura del informe IEEE. Se reutiliza sin cambios el protocolo de `../integrante2/PROTOCOLO.md` (target, particiones, gap y 33 características). Este análisis no usa el test; la evaluación final en prueba está en `../integrante2/results/test_final/`.
 
 ## Preguntas que responde
 
@@ -13,15 +13,15 @@ Análisis complementario a los modelos de integrante 2: *ablation study*, rendim
 
 | Conjunto | Variables | AP | F1 |
 |---|---|---|---|
-| A0: tasa actual | 3 | 0.536 | 0.539 |
-| A: comisiones | 16 | 0.619 | 0.567 |
-| B: + actividad de la red | 29 | 0.632 | 0.573 |
-| C: + calendario (las 33) | 33 | 0.631 | 0.568 |
+| A0: tasa actual | 3 | 0.535 | 0.539 |
+| A: comisiones | 16 | 0.622 | 0.569 |
+| B: + actividad de la red | 29 | 0.629 | 0.565 |
+| C: + calendario (las 33) | 33 | 0.630 | 0.571 |
 | Persistencia (referencia) | — | — | 0.540 |
 
-- **H1:** la tasa actual sola equivale a la persistencia; la historia de comisiones aporta +0.084 de AP (IC 95 % [0.070, 0.095], bootstrap por bloques semanales).
-- **H2:** la actividad de la red, incluidas las comisiones totales como en la H2 de P1, aporta +0.012 de AP (IC [0.008, 0.017]) y +0.006 de F1 (IC [0.001, 0.011]); el calendario, nada.
-- **H3:** degradación moderada en el tercil de mayor volatilidad (F1 0.548 frente a 0.566–0.575). El error principal son los cambios de clase: el modelo anticipa el 39 % de los finales de episodio y solo el 14 % de los inicios.
+- **H1:** la tasa actual sola equivale a la persistencia; la historia de comisiones aporta +0.088 de AP (IC 95 % [0.075, 0.099], bootstrap por bloques semanales).
+- **H2:** la actividad de la red, incluidas las comisiones totales como en la H2 de P1, aporta +0.007 de AP (IC [0.003, 0.011]); el calendario no cambia la AP. En F1 las diferencias entre A, B y C son pequeñas y dependen del umbral.
+- **H3:** degradación moderada en el tercil de mayor volatilidad (F1 0.554 frente a 0.567–0.582). El error principal son los cambios de clase: el modelo anticipa el 35 % de los finales de episodio y solo el 19 % de los inicios.
 
 ## Archivos
 

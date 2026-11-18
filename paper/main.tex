@@ -23,7 +23,7 @@ Machine Learning (CS3061) --- 2026-2}
 \maketitle
 
 \begin{abstract}
-En Bitcoin, el espacio de cada bloque es limitado y las transacciones compiten mediante comisiones. Este trabajo plantea una clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del bloque siguiente superará el percentil 75 de las 1008 tasas más recientes, usando solo información disponible hasta el bloque actual. Se emplean 418\,720 bloques de 2016 a 2023 del conjunto \textit{Bitcoin Blockchain Historical Data}, con una partición cronológica 70/15/15. Se comparan una referencia de persistencia, una regresión logística regularizada, Random Forest e HistGradientBoosting, con selección temporal de hiperparámetros y del umbral de decisión. En prueba, RF y HGB alcanzan F1 de 0.605 y 0.609, frente a 0.576 de la persistencia y 0.570 de la regresión logística; sus precisiones promedio son 0.684 y 0.690. En validación, los modelos de árboles alcanzan un F1 de 0.564--0.571 y una precisión promedio de 0.62--0.63, frente a 0.540 y 0.593 de las referencias. Un estudio de ablación muestra que la ganancia procede de la historia reciente de las comisiones (+0.084 de precisión promedio), mientras que la actividad de la red aporta poco (+0.012) y el calendario nada. El análisis de errores indica que los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran en promedio unos dos bloques, lo que apunta a la ausencia de información del \textit{mempool} como límite principal.
+En Bitcoin, el espacio de cada bloque es limitado y las transacciones compiten mediante comisiones. Este trabajo plantea una clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisión del bloque siguiente superará el percentil 75 de las 1008 tasas más recientes, usando solo información disponible hasta el bloque actual. Se emplean 418\,720 bloques de 2016 a 2023 del conjunto \textit{Bitcoin Blockchain Historical Data}, con una partición cronológica 70/15/15. Se comparan una referencia de persistencia, una regresión logística regularizada, Random Forest e HistGradientBoosting, con selección temporal de hiperparámetros y del umbral de decisión. En prueba, RF y HGB alcanzan F1 de 0.605 y 0.609, frente a 0.576 de la persistencia y 0.570 de la regresión logística; sus precisiones promedio son 0.684 y 0.690. En validación, los modelos de árboles alcanzan un F1 de 0.564--0.571 y una precisión promedio de 0.62--0.63, frente a 0.540 y 0.593 de las referencias. Un estudio de ablación muestra que la ganancia procede de la historia reciente de las comisiones (+0.088 de precisión promedio), mientras que la actividad de la red aporta poco (+0.007) y el calendario nada. El análisis de errores indica que los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran en promedio unos dos bloques, lo que apunta a la ausencia de información del \textit{mempool} como límite principal.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -228,7 +228,7 @@ HGB & \textbf{180 it., 15 hojas, $\eta$=0.10, L2=5} & \textbf{0.630} & 0.747 \\
 \end{tabular}
 \end{table}
 
-En la regresión logística, las 16 configuraciones quedaron dentro de 0.0003 de F1 tras ajustar el umbral; se eligió L2, $C=1$, sin ponderación. Con 288\,784 observaciones y 22 variables no hay margen de sobreajuste que la penalización deba corregir. El ajuste del umbral influyó mucho más que la regularización: con el corte de 0.5 el F1 era 0.417, y con el umbral ajustado (0.312) subió a 0.558.
+En la regresión logística, las 16 configuraciones quedaron dentro de 0.0003 de F1 tras ajustar el umbral; se eligió L2, $C=1$, sin ponderación. Con 288\,784 observaciones y 22 variables no hay margen de sobreajuste que la penalización deba corregir. El ajuste del umbral influyó mucho más que la regularización: con el corte de 0.5 el F1 era 0.417, y con el umbral ajustado (0.312) subió a 0.557.
 
 % =====================================================================
 \section{Diseño experimental y evaluación}
@@ -338,7 +338,7 @@ Las curvas de RF y HGB (Fig.~\ref{fig:pr}) se mantienen por encima de la prevale
 \end{figure}
 
 \subsection{Estudio de ablación}
-Para aislar el aporte de cada grupo de variables se entrenó un mismo HGB sencillo (150 iteraciones, 15 hojas, tasa 0.1, hoja mínima 80, L2 de 1) con cuatro subconjuntos de las 33 variables, usando los mismos folds, margen y criterio de umbral: A0, la tasa actual ($f_t$, $\theta_t$ y su razón; 3 variables); A, todas las de comisiones (16); B, comisiones y actividad de la red, incluidas las comisiones totales como se planteó en H2 (29); y C, todas (33). Como control, el conjunto C obtiene un F1 de validación de 0.568, cercano al 0.571 del HGB optimizado. Los resultados se muestran en la Tabla~\ref{tab:ablation} y la Fig.~\ref{fig:ablation}.
+Para aislar el aporte de cada grupo de variables se entrenó un mismo HGB, con la configuración ganadora de la búsqueda (180 iteraciones, 15 hojas, tasa 0.1, hoja mínima 80, L2 de 5), con cuatro subconjuntos de las 33 variables, usando los mismos folds, margen y criterio de umbral: A0, la tasa actual ($f_t$, $\theta_t$ y su razón; 3 variables); A, todas las de comisiones (16); B, comisiones y actividad de la red, incluidas las comisiones totales como se planteó en H2 (29); y C, todas (33). Como control, el conjunto C reproduce exactamente el HGB de la Tabla~\ref{tab:resultados} (F1 de 0.571 y AP de 0.630 en validación). Los resultados se muestran en la Tabla~\ref{tab:ablation} y la Fig.~\ref{fig:ablation}.
 
 \begin{table}[htbp]
 \caption{Ablación en validación. $\Delta$AP frente al conjunto anterior, con IC 95\,\% por \textit{bootstrap} de bloques.}
@@ -350,10 +350,10 @@ Para aislar el aporte de cada grupo de variables se entrenó un mismo HGB sencil
 \toprule
 Conjunto & Var. & AP & F1 & $\Delta$AP [IC 95\,\%] \\
 \midrule
-A0: tasa actual & 3 & 0.536 & 0.539 & -- \\
-A: comisiones & 16 & 0.619 & 0.567 & +0.084 [0.070, 0.095] \\
-B: + actividad & 29 & 0.632 & 0.573 & +0.012 [0.008, 0.017] \\
-C: + calendario & 33 & 0.631 & 0.568 & $-$0.001 [$-$0.006, 0.004] \\
+A0: tasa actual & 3 & 0.535 & 0.539 & -- \\
+A: comisiones & 16 & 0.622 & 0.569 & +0.088 [0.075, 0.099] \\
+B: + actividad & 29 & 0.629 & 0.565 & +0.007 [0.003, 0.011] \\
+C: + calendario & 33 & 0.630 & 0.571 & +0.001 [$-$0.005, 0.005] \\
 Persistencia & -- & -- & 0.540 & -- \\
 \bottomrule
 \end{tabular}
@@ -366,10 +366,10 @@ Persistencia & -- & -- & 0.540 & -- \\
 \label{fig:ablation}
 \end{figure}
 
-Con solo la tasa actual, el modelo obtiene el mismo F1 que la persistencia (0.539 frente a 0.540): con tres variables, aprende la misma regla. La historia de las comisiones aporta la mayor mejora. La actividad de la red añade una mejora pequeña pero detectable, también en F1 (+0.006, IC [0.001, 0.011]). El calendario no aporta. El mismo orden (A0 $<$ A $<$ B $\approx$ C en AP) se observa en los tres folds de entrenamiento, con AP de 0.59--0.70 para A0 y de 0.70--0.79 para B.
+Con solo la tasa actual, el modelo obtiene el mismo F1 que la persistencia (0.539 frente a 0.540): con tres variables, aprende la misma regla. La historia de las comisiones aporta la mayor mejora (+0.030 de F1, IC [0.023, 0.038]). La actividad de la red añade una mejora pequeña pero detectable en AP, y el calendario no cambia la AP. En F1, las diferencias entre A, B y C son pequeñas y de signo variable (B frente a A: $-$0.004, IC [$-$0.009, 0.001]; C frente a B: +0.006, IC [0.000, 0.012]), porque dependen del umbral elegido en cada caso (0.275 para A y 0.350 para B y C); por eso la comparación se basa en la AP. El mismo orden (A0 $<$ A $<$ B $\approx$ C en AP) se observa en los tres folds de entrenamiento, con AP de 0.59--0.70 para A0 y de 0.69--0.79 para B.
 
 \subsection{Rendimiento por periodos y volatilidad}
-Por trimestre de validación, el F1 varía entre 0.50 y 0.64 de forma paralela en todos los métodos y sigue la proporción de positivos: los trimestres con menos bloques altos (2021T3 y 2022T1, alrededor del 19\,\%) son los de menor F1 (Fig.~\ref{fig:trimestre}). La ventaja de los modelos con historia de comisiones sobre la persistencia es positiva en todos los trimestres (+0.01 a +0.04).
+Por trimestre de validación, el F1 varía entre 0.50 y 0.64 de forma paralela en todos los métodos y sigue la proporción de positivos: los trimestres con menos bloques altos (2021T3 y 2022T1, alrededor del 19\,\%) son los de menor F1 (Fig.~\ref{fig:trimestre}). La ventaja de los modelos con historia de comisiones sobre la persistencia es positiva en todos los trimestres (+0.02 a +0.04 para el conjunto C).
 
 \begin{figure}[htbp]
 \centering
@@ -378,7 +378,7 @@ Por trimestre de validación, el F1 varía entre 0.50 y 0.64 de forma paralela e
 \label{fig:trimestre}
 \end{figure}
 
-La volatilidad reciente se midió con el coeficiente de variación de las últimas 144 tasas, con terciles fijados en entrenamiento. El F1 del modelo con las 33 variables es 0.566, 0.575 y 0.548 en volatilidad baja, media y alta, y su AP 0.629, 0.643 y 0.595 (Fig.~\ref{fig:volatilidad}). En el tercil alto hay menos positivos (16\,\% frente a 21--23\,\%), lo que reduce el F1 de forma mecánica, y solo el 11\,\% de los bloques de validación cae en ese tercil.
+La volatilidad reciente se midió con el coeficiente de variación de las últimas 144 tasas, con terciles fijados en entrenamiento. El F1 del modelo con las 33 variables es 0.567, 0.582 y 0.554 en volatilidad baja, media y alta, y su AP 0.626, 0.643 y 0.596 (Fig.~\ref{fig:volatilidad}). En el tercil alto hay menos positivos (16\,\% frente a 21--23\,\%), lo que reduce el F1 de forma mecánica, y solo el 11\,\% de los bloques de validación cae en ese tercil.
 
 \begin{figure}[htbp]
 \centering
@@ -388,7 +388,7 @@ La volatilidad reciente se midió con el coeficiente de variación de las últim
 \end{figure}
 
 \subsection{Análisis de errores}
-El 19.8\,\% de los bloques de validación es un cambio de clase, y un episodio de comisión alta dura en promedio 2.17 bloques, poco más de veinte minutos. La persistencia falla, por construcción, en todas esas transiciones y acierta en todos los tramos estables. El modelo con las 33 variables anticipa el 39\,\% de los finales de episodio, pero solo el 14\,\% de los inicios, a cambio de errar en el 3.5\,\% de los tramos bajos estables y en el 10\,\% de los altos (Fig.~\ref{fig:transiciones}).
+El 19.8\,\% de los bloques de validación es un cambio de clase, y un episodio de comisión alta dura en promedio 2.17 bloques, poco más de veinte minutos. La persistencia falla, por construcción, en todas esas transiciones y acierta en todos los tramos estables. El modelo con las 33 variables anticipa el 35\,\% de los finales de episodio, pero solo el 19\,\% de los inicios, a cambio de errar en el 4.9\,\% de los tramos bajos estables y en el 8.5\,\% de los altos (Fig.~\ref{fig:transiciones}).
 
 \begin{figure}[htbp]
 \centering
@@ -397,7 +397,7 @@ El 19.8\,\% de los bloques de validación es un cambio de clase, y un episodio d
 \label{fig:transiciones}
 \end{figure}
 
-Los errores se concentran cerca del umbral (Fig.~\ref{fig:margen}). La tasa de error es del 6\,\% cuando la tasa del bloque siguiente queda por debajo de la mitad del umbral y del 74\,\% cuando lo supera por menos del 5\,\%. Los falsos positivos son bloques actuales caros (razón mediana con el umbral de 1.17) seguidos de uno algo más barato (margen mediano 0.80); los falsos negativos, bloques baratos (0.70) seguidos de uno que supera el umbral (1.25). La volatilidad reciente es casi igual en los cuatro tipos de predicción, y los errores se agrupan en el tiempo: la probabilidad de error tras un error es 0.40, frente a 0.18 en general.
+Los errores se concentran cerca del umbral (Fig.~\ref{fig:margen}). La tasa de error es del 8\,\% cuando la tasa del bloque siguiente queda por debajo de la mitad del umbral y del 72\,\% cuando lo supera por menos del 5\,\%. Los falsos positivos son bloques actuales caros (razón mediana con el umbral de 1.14) seguidos de uno algo más barato (margen mediano 0.79); los falsos negativos, bloques baratos (0.69) seguidos de uno que supera el umbral (1.25). La volatilidad reciente es casi igual en los cuatro tipos de predicción, y los errores se agrupan en el tiempo: la probabilidad de error tras un error es 0.42, frente a 0.19 en general.
 
 \begin{figure}[htbp]
 \centering
@@ -412,7 +412,7 @@ Los errores se concentran cerca del umbral (Fig.~\ref{fig:margen}). La tasa de e
 
 \textbf{Por qué los árboles superan a la logística.} Con variables de contenido similar, los árboles obtienen una AP mayor. Esto sugiere que la relación entre la historia de la tasa y la clase siguiente no es lineal: el efecto de una variable, como la volatilidad reciente, puede depender de qué tan cerca esté la tasa actual del umbral, una interacción que los árboles representan de forma natural. La logística, cuyas 16 configuraciones rinden igual, parece limitada por su forma funcional y no por la regularización. Entre los ensambles, HGB generaliza algo mejor que RF, con una brecha menor entre ajuste y validación.
 
-\textbf{Actividad de la red y calendario.} La actividad aporta poco porque, desde 2016, los bloques están casi siempre llenos: su tamaño y su número de transacciones varían poco, y la congestión se manifiesta en el precio y no en el volumen. El calendario muestra señal en la logística, pero no añade nada a los árboles una vez incluidas las medias móviles de 6 y 144 bloques, que ya recogen el ciclo diario. Además, parte de esa señal procede de la propia ventana semanal del umbral, por lo que no debe interpretarse como una propiedad del mercado.
+\textbf{Actividad de la red y calendario.} La actividad aporta poco porque, desde 2016, los bloques están casi siempre llenos: su tamaño y su número de transacciones varían poco, y la congestión se manifiesta en el precio y no en el volumen. El calendario muestra señal en la logística, pero no mejora la AP de los árboles una vez incluidas las medias móviles de 6 y 144 bloques, que ya recogen el ciclo diario. Además, parte de esa señal procede de la propia ventana semanal del umbral, por lo que no debe interpretarse como una propiedad del mercado.
 
 \textbf{Techo de rendimiento.} La ventaja sobre la persistencia es consistente pero modesta en F1. Los episodios de comisión alta son muy cortos, y su inicio corresponde a la llegada de demanda nueva que todavía no se refleja en los bloques minados. Además, muchas etiquetas dependen de diferencias de uno o dos satoshis por byte respecto a un umbral que se mueve en cada bloque. Ambas condiciones limitan el rendimiento alcanzable con estas variables, independientemente del algoritmo. La diferencia en AP es mayor que en F1: los modelos ordenan bien los bloques según su riesgo, aunque un único umbral binario recorte parte de esa ventaja.
 
@@ -425,7 +425,7 @@ Los errores se concentran cerca del umbral (Fig.~\ref{fig:margen}). La tasa de e
 \item \textbf{Conjuntos de variables distintos.} La logística (22 variables) y los árboles (33) no comparten exactamente las mismas entradas, por lo que su comparación mezcla el efecto del algoritmo y el de las variables.
 \item \textbf{Selección del umbral de la logística en validación,} cuya proporción de positivos (21.5\,\%) difiere de la de prueba (24.9\,\%).
 \item \textbf{Validación tranquila,} con pocos episodios de alta volatilidad.
-\item \textbf{Alcance del ablation,} obtenido con un solo algoritmo y una configuración fija.
+\item \textbf{Alcance del ablation,} obtenido con un solo algoritmo y la configuración elegida con las 33 variables, sin reajustarla para cada subconjunto.
 \item \textbf{Periodo de estudio,} limitado a 2016--2023.
 \end{itemize}
 
@@ -437,8 +437,8 @@ El modelo describe el mercado agregado y no utiliza información personal. Sin e
 Este trabajo evaluó si las estadísticas históricas a nivel de bloque permiten anticipar si el siguiente bloque de Bitcoin tendrá comisiones elevadas respecto a la semana anterior.
 
 \begin{itemize}
-\item \textbf{H1 se confirma:} la tasa reciente es el predictor dominante. Sin embargo, el estado actual por sí solo equivale a la persistencia; el valor aparece al incorporar la historia reciente de las comisiones (+0.084 de AP).
-\item \textbf{H2 se confirma:} la actividad de la red aporta una mejora pequeña pero detectable (+0.012 de AP), muy inferior a la de la historia de comisiones, y el calendario no aporta información adicional.
+\item \textbf{H1 se confirma:} la tasa reciente es el predictor dominante. Sin embargo, el estado actual por sí solo equivale a la persistencia; el valor aparece al incorporar la historia reciente de las comisiones (+0.088 de AP).
+\item \textbf{H2 se confirma:} la actividad de la red aporta una mejora pequeña pero detectable (+0.007 de AP), muy inferior a la de la historia de comisiones, y el calendario no aporta información adicional.
 \item \textbf{H3 se confirma parcialmente:} el rendimiento disminuye en el tercil de mayor volatilidad de forma moderada. La principal fuente de error son los cambios de clase, sobre todo el inicio de los episodios de comisión alta.
 \end{itemize}
 

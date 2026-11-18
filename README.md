@@ -18,11 +18,11 @@ Clasificación binaria a nivel de bloque: anticipar si la tasa mediana de comisi
 |---|---|---|---|---|
 | Persistencia | 0.540 | — | 0.576 | — |
 | Regresión logística | 0.557 | 0.593 | 0.570 | 0.617 |
-| Random Forest | 0.564 | 0.623 | 0.605 | 0.684 |
+| Random Forest | 0.564 | 0.622 | 0.605 | 0.684 |
 | HistGradientBoosting | 0.571 | 0.630 | 0.609 | 0.690 |
 
 - En prueba, RF (F1 0.6048) y HGB (0.6093) superan a la persistencia (0.5763); la logística (0.5704) no la supera. Son diferencias descriptivas, sin prueba de significancia.
-- El ablation muestra que la ganancia viene de la historia reciente de las comisiones (+0.084 de AP); la actividad de la red aporta poco (+0.012) y el calendario nada.
+- El ablation muestra que la ganancia viene de la historia reciente de las comisiones (+0.088 de AP); la actividad de la red aporta poco (+0.007) y el calendario nada.
 - Los modelos fallan sobre todo al inicio de los episodios de comisión alta, que duran unos dos bloques. Falta el estado del *mempool*, que el dataset no contiene.
 
 La prueba de los árboles conserva los modelos y umbrales originales (RF 0.300; HGB 0.350), sin reajuste con validación. Se reprodujeron las predicciones de validación y las métricas de persistencia antes de consolidar la comparación. [Métricas de prueba](fase2/integrante2/results/test_final/metricas.csv) y [protocolo](fase2/integrante2/PROTOCOLO.md).
